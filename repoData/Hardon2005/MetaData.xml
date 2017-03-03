@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.0" xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ds="eml://ecoinformatics.org/dataset-2.1.0" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0&#10;&#9;&#9;&#9;&#9;http://nis.lternet.edu/schemas/EML/eml-2.1.0/eml.xsd" packageId="knb-lter-bnz.335.18" system="knb" scope="system">
+<access scope="document" order="allowFirst" authSystem="knb">
+<allow>
+<principal>uid=BNZ,o=lter,dc=ecoinformatics,dc=org</principal>
+<permission>all</permission>
+</allow>
+<allow>
+<principal>public</principal>
+<permission>read</permission>
+</allow>
+</access>
+<dataset>
+<shortName>knb-lter-bnz.335.18</shortName>
+<title>Bonanza Creek moisture gradient soil core data: 2005.</title>
+<creator>
+<individualName>
+<givenName>Jennifer</givenName>
+<givenName>W.</givenName>
+<surName>Harden</surName>
+</individualName>
+<positionName>Senior Investigator</positionName>
+<address>
+<deliveryPoint>U.S. Geological Survey 345 Middlefield Road, MS 962</deliveryPoint>
+<city>Menlo Park</city>
+<administrativeArea>CA</administrativeArea>
+<postalCode>94025</postalCode>
+<country>United States</country>
+</address>
+<phone phonetype="voice">(650) 329-4949</phone>
+<phone phonetype="fax">(650) 329-4920</phone>
+<electronicMailAddress>jharden@usgs.gov</electronicMailAddress>
+<onlineUrl>https://profile.usgs.gov/jharden</onlineUrl>
+</creator>
+<creator>
+<individualName>
+<givenName>Merritt</givenName>
+<givenName>R</givenName>
+<surName>Turetsky</surName>
+</individualName>
+<positionName>Senior Investigator</positionName>
+<address>
+<deliveryPoint>Department of Integrative Biology  University of Guelph</deliveryPoint>
+<city>Guelph</city>
+<administrativeArea>ON</administrativeArea>
+<postalCode>N1G 2W1</postalCode>
+<country>Canada</country>
+</address>
+<phone phonetype="voice">(519) 824-4120 ext 56166</phone>
+<!--No fax info present in Database  ( pers/fax when lead_contact=1 )-->
+<electronicMailAddress>mrt@uoguelph.ca</electronicMailAddress>
+<onlineUrl>http://www.uoguelph.ca/ib/people/faculty/turetsky.shtml</onlineUrl>
+</creator>
+<creator>
+<individualName>
+<givenName>Kristen</givenName>
+<givenName>L</givenName>
+<surName>Manies</surName>
+</individualName>
+<positionName>Affiliate Scientist</positionName>
+<address>
+<deliveryPoint>345 Middlefield Rd., MS 962</deliveryPoint>
+<city>Menlo Park</city>
+<administrativeArea>CA</administrativeArea>
+<postalCode>94025</postalCode>
+<country>United States</country>
+</address>
+<phone phonetype="voice">(650) 329-5010</phone>
+<phone phonetype="fax">(650) 329-4920</phone>
+<electronicMailAddress>kmanies@usgs.gov</electronicMailAddress>
+<onlineUrl>http://carbon.wr.usgs.gov/Manies.html</onlineUrl>
+</creator>
+<creator>
+<individualName>
+<givenName>Mark</givenName>
+<givenName>P.</givenName>
+<surName>Waldrop</surName>
+</individualName>
+<positionName>Affiliate Scientist</positionName>
+<address>
+<deliveryPoint>345 Middlefield Rd., MS 962</deliveryPoint>
+<city>Menlo Park</city>
+<administrativeArea>CA</administrativeArea>
+<postalCode>94025</postalCode>
+<country>USA</country>
+</address>
+<phone phonetype="voice">(650) 329-5005</phone>
+<phone phonetype="fax">(650) 329-4920</phone>
+<electronicMailAddress>mwaldrop@usgs.gov</electronicMailAddress>
+<onlineUrl>http://carbon.wr.usgs.gov/Waldrop.html</onlineUrl>
+</creator>
+<creator>
+<organizationName>Bonanza Creek LTER</organizationName>
+<address>
+<deliveryPoint>Boreal Ecology Cooperative Research Unit </deliveryPoint>
+<deliveryPoint>University of Alaska Fairbanks</deliveryPoint>
+<deliveryPoint>P.O. Box 756780 </deliveryPoint>
+<city>Fairbanks</city>
+<administrativeArea>AK</administrativeArea>
+<postalCode>99775</postalCode>
+<country>USA</country>
+</address>
+<phone phonetype="voice">907-474-6364</phone>
+<phone phonetype="fax">907-474-6251</phone>
+<electronicMailAddress>uaf-bnz-im-team@alaska.edu</electronicMailAddress>
+<onlineUrl>http://www.lter.uaf.edu</onlineUrl>
+</creator>
+<metadataProvider>
+<organizationName>Bonanza Creek LTER</organizationName>
+<positionName>Data Manager</positionName>
+<address>
+<deliveryPoint>Boreal Ecology Cooperative Research Unit </deliveryPoint>
+<deliveryPoint>University of Alaska Fairbanks</deliveryPoint>
+<deliveryPoint>P.O. Box 756780 </deliveryPoint>
+<city>Fairbanks</city>
+<administrativeArea>AK</administrativeArea>
+<postalCode>99775</postalCode>
+<country>USA</country>
+</address>
+<phone phonetype="voice">907-474-6364</phone>
+<phone phonetype="fax">907-474-6251</phone>
+<electronicMailAddress>uaf-bnz-im-team@alaska.edu</electronicMailAddress>
+<onlineUrl>http://www.lter.uaf.edu</onlineUrl>
+</metadataProvider>
+<associatedParty>
+<individualName>
+<givenName>Lee</givenName>
+<givenName>E.</givenName>
+<surName>Pruett</surName>
+</individualName>
+<positionName>Physical Science Technician</positionName>
+<address>
+<deliveryPoint>345 Middlefield Rd., MS 962</deliveryPoint>
+<city>Menlo Park</city>
+<administrativeArea>California</administrativeArea>
+<postalCode>94025</postalCode>
+<country>United States</country>
+</address>
+<phone phonetype="voice">(650) 329-5241</phone>
+<phone phonetype="fax">(650) 329-4920</phone>
+<role>Associated investigator</role>
+</associatedParty>
+<pubDate>2008-03-27</pubDate>
+<abstract>
+<para>This dataset contains the results of a soil sampling effort undertaken in 2005 along a landscape gradient within the Bonanza Creek LTER.  Soils were sampled at 5 sites located within unique vegetative environments ranging from a wetland to an upland forest over a distance of 260 m.  Data includes, but is not limited to percent carbon, percent nitrogen, 13C of the gas phase, 14C of the gas phase, 13C of the solid phase, bulk density, CO2 flux and DOC</para>
+</abstract>
+<keywordSet>
+<keyword>carbon</keyword>
+<keyword>nitrogen</keyword>
+<keyword>soils</keyword>
+<keyword>organic matter</keyword>
+<keyword>ecological transect</keyword>
+<keyword>isotopes</keyword>
+<keyword>soil carbon fluxes</keyword>
+<keywordThesaurus>Soils</keywordThesaurus>
+</keywordSet>
+<intellectualRights>
+<section>
+<title>Data Use</title>
+<para>This work has been produced as part of the Long Term Ecological Research Program and data users should adhere to the Data Use Agreement of the Long Term Ecological Research Network.</para>
+</section>
+<section>
+<title>Citation</title>
+<para>It is considered a matter of professional ethics to acknowledge the work of other scientists. Thus, the Data User should properly cite the Data Set in any publications or in the metadata of any derived data products that were produced using the Data Set. Citation should take the following general form: Creator(s), Year of Data Publication, Title of Dataset, Publisher, Dataset identifier, Dataset URL, Dataset DOI.  For Example:   Van Cleve, Keith; Chapin, F. Stuart; Ruess, Roger W. 2016. Bonanza Creek Experimental Forest: Hourly Temperature (sample, min, max) at 50 cm and 150 cm from 1988 to Present, Bonanza Creek LTER - University of Alaska Fairbanks. BNZ:1, http://www.lter.uaf.edu/data/data-detail/id/1. doi:10.6073/pasta/725db90d86686be13e6d6b2da5d61217.</para>
+</section>
+<section>
+<title>Acknowledgement</title>
+<para>The Data User should acknowledge any institutional support or specific funding awards referenced in the metadata accompanying this dataset in any publications where the Data Set contributed significantly to its content. Acknowledgements should identify the supporting party, the party that received the support, and any identifying information such as grant numbers. For example: Data are provided by the Bonanza Creek LTER, a partnership between the University of Alaska Fairbanks, and the U.S. Forest Service. Significant funding for collection of these data was provided by the National Science Foundation Long-Term Ecological Research program (NSF Grant numbers DEB-1026415, DEB-0620579, DEB-0423442, DEB-0080609, DEB-9810217, DEB-9211769, DEB-8702629) and by the USDA Forest Service, Pacific Northwest Research Station (Agreement # RJVA-PNW-01-JV-11261952-231).</para>
+</section>
+<section>
+<title>Notification</title>
+<para>The Data User will notify the Data Set Contact when any derivative work or publication based on or derived from the Data Set is distributed.</para>
+</section>
+<section>
+<title>Collaboration</title>
+<para>The Data Set has been released in the spirit of open scientific collaboration. Data Users are thus strongly encouraged to consider consultation, collaboration and/or co-authorship with the Data Set Creator.</para>
+</section>
+<section>
+<title>Disclaimer</title>
+<para>While substantial efforts are made to ensure the accuracy of data and documentation contained in this Data Set, complete accuracy of data and metadata cannot be guaranteed. All data and metadata are made available in its present condition. The Data User holds all parties involved in the production or distribution of the Data Set harmless for damages resulting from its use or interpretation.</para>
+</section>
+<!--No additional acknowledgements found in database (datafile/intellectual_rights)-->
+</intellectualRights>
+<distribution id="distributionReference">
+<online>
+<url function="information">http://www.lter.uaf.edu/data/data-detail/id/335</url>
+</online>
+</distribution>
+<coverage>
+<geographicCoverage id="geoReference">
+<geographicDescription>Dataset geographic description information is unavailable. {datafile/geoCoverage is empty}</geographicDescription>
+<boundingCoordinates>
+<westBoundingCoordinate>-148.31132</westBoundingCoordinate>
+<eastBoundingCoordinate>-148.31132</eastBoundingCoordinate>
+<northBoundingCoordinate>64.70082</northBoundingCoordinate>
+<southBoundingCoordinate>64.70082</southBoundingCoordinate>
+</boundingCoordinates>
+</geographicCoverage>
+<temporalCoverage>
+<rangeOfDates>
+<beginDate>
+<calendarDate>2005-09-06</calendarDate>
+</beginDate>
+<endDate>
+<calendarDate>2005-10-04</calendarDate>
+</endDate>
+</rangeOfDates>
+</temporalCoverage>
+</coverage>
+<maintenance>
+<description>
+<section>
+<title>Status</title>
+<para>Completed</para>
+</section>
+</description>
+</maintenance>
+<contact>
+<organizationName>Bonanza Creek LTER</organizationName>
+<positionName>Data Manager</positionName>
+<address>
+<deliveryPoint>Boreal Ecology Cooperative Research Unit </deliveryPoint>
+<deliveryPoint>University of Alaska Fairbanks</deliveryPoint>
+<deliveryPoint>P.O. Box 756780 </deliveryPoint>
+<city>Fairbanks</city>
+<administrativeArea>AK</administrativeArea>
+<postalCode>99775</postalCode>
+<country>USA</country>
+</address>
+<phone phonetype="voice">907-474-6364</phone>
+<phone phonetype="fax">907-474-6251</phone>
+<electronicMailAddress>uaf-bnz-im-team@alaska.edu</electronicMailAddress>
+<onlineUrl>http://www.lter.uaf.edu</onlineUrl>
+</contact>
+<publisher>
+<organizationName>Bonanza Creek LTER</organizationName>
+<address>
+<deliveryPoint>Boreal Ecology Cooperative Research Unit </deliveryPoint>
+<deliveryPoint>University of Alaska Fairbanks</deliveryPoint>
+<deliveryPoint>P.O. Box 756780 </deliveryPoint>
+<city>Fairbanks</city>
+<administrativeArea>AK</administrativeArea>
+<postalCode>99775</postalCode>
+<country>USA</country>
+</address>
+<phone phonetype="voice">907-474-6364</phone>
+<phone phonetype="fax">907-474-6251</phone>
+</publisher>
+<pubPlace>Bonanza Creek LTER</pubPlace>
+<methods>
+<methodStep>
+<description>
+<section>
+<title>Experimental Design</title>
+<para>These sites were measured to help us gain an understanding of how to detect future changes in vegetation through the use of laboratory methods, such as the analysis of isotopes in all three phases of carbon.CO2 flux data are the result of 48 hour incubation periods.  DOC and isotope data are from points in time within the one month the experiment was run.</para>
+</section>
+</description>
+</methodStep>
+<sampling>
+<studyExtent>
+<coverage>
+<geographicCoverage>
+<geographicDescription>BZBS -- A well drained black spruce stand.
+A well drained black spruce stand..  Site alternate names:  BS</geographicDescription>
+<boundingCoordinates>
+<westBoundingCoordinate>-148.31132</westBoundingCoordinate>
+<eastBoundingCoordinate>-148.31132</eastBoundingCoordinate>
+<northBoundingCoordinate>64.70082</northBoundingCoordinate>
+<southBoundingCoordinate>64.70082</southBoundingCoordinate>
+</boundingCoordinates>
+</geographicCoverage>
+<geographicCoverage>
+<geographicDescription>BZWB -- A site dominated by shrubs, including willow and birch species..  Site alternate names:  WB</geographicDescription>
+<boundingCoordinates>
+<westBoundingCoordinate>-148.31132</westBoundingCoordinate>
+<eastBoundingCoordinate>-148.31132</eastBoundingCoordinate>
+<northBoundingCoordinate>64.70082</northBoundingCoordinate>
+<southBoundingCoordinate>64.70082</southBoundingCoordinate>
+</boundingCoordinates>
+</geographicCoverage>
+<geographicCoverage>
+<geographicDescription>BZTG -- A tussock site dominated by Calamagrastis spp. with a sparse covering of Drepanocladus..  Site alternate names:  TG</geographicDescription>
+<boundingCoordinates>
+<westBoundingCoordinate>-148.31132</westBoundingCoordinate>
+<eastBoundingCoordinate>-148.31132</eastBoundingCoordinate>
+<northBoundingCoordinate>64.70082</northBoundingCoordinate>
+<southBoundingCoordinate>64.70082</southBoundingCoordinate>
+</boundingCoordinates>
+</geographicCoverage>
+<geographicCoverage>
+<geographicDescription>BZEC -- An intermediate rich fen, which includes a diverse groundlayer mixture of Sphagnum, brown mosses, and Drepanocladus spp., and a sparse cover of Equisetum. .  Site alternate names:  EC</geographicDescription>
+<boundingCoordinates>
+<westBoundingCoordinate>-148.31132</westBoundingCoordinate>
+<eastBoundingCoordinate>-148.31132</eastBoundingCoordinate>
+<northBoundingCoordinate>64.70082</northBoundingCoordinate>
+<southBoundingCoordinate>64.70082</southBoundingCoordinate>
+</boundingCoordinates>
+</geographicCoverage>
+<geographicCoverage>
+<geographicDescription>BZDE -- A fen dominated by emergent species including Equisetum and Carex  species, with a sparse cover of brown mosses..  Site alternate names:  DE</geographicDescription>
+<boundingCoordinates>
+<westBoundingCoordinate>-148.31132</westBoundingCoordinate>
+<eastBoundingCoordinate>-148.31132</eastBoundingCoordinate>
+<northBoundingCoordinate>64.70082</northBoundingCoordinate>
+<southBoundingCoordinate>64.70082</southBoundingCoordinate>
+</boundingCoordinates>
+</geographicCoverage>
+<temporalCoverage>
+<rangeOfDates>
+<beginDate>
+<calendarDate>2005-09-06</calendarDate>
+</beginDate>
+<endDate>
+<calendarDate>2005-10-04</calendarDate>
+</endDate>
+</rangeOfDates>
+</temporalCoverage>
+</coverage>
+</studyExtent>
+<samplingDescription>
+<section>
+<title>Sampling Frequency</title>
+<para>once each year</para>
+</section>
+</samplingDescription>
+</sampling>
+</methods>
+<project>
+<title>The Bonanza Creek LTER</title>
+<personnel id="VanCleveID">
+<individualName>
+<givenName>Keith</givenName>
+<surName>Van Cleve</surName>
+</individualName>
+<organizationName>Bonanza Creek LTER</organizationName>
+<positionName>Lead Principal Investigator</positionName>
+<role>Principal Investigator</role>
+</personnel>
+<personnel id="ChapinID">
+<individualName>
+<givenName>F.S.</givenName>
+<givenName>Stuart</givenName>
+<surName>Chapin</surName>
+</individualName>
+<organizationName>Bonanza Creek LTER</organizationName>
+<positionName>Lead Principal Investigator</positionName>
+<address>
+<deliveryPoint>Department of Biology and Wildlife;  Institute of Arctic Biology:  University of Alaska Fairbanks 193 Arctic Health P.O. Box 757000</deliveryPoint>
+<city>Fairbanks</city>
+<administrativeArea>AK </administrativeArea>
+<postalCode>99775</postalCode>
+<country>United States</country>
+</address>
+<phone phonetype="voice">(907) 455-6408</phone>
+<phone phonetype="fax">(907) 474-6967</phone>
+<electronicMailAddress>terry.chapin@alaska.edu</electronicMailAddress>
+<onlineUrl>http://terrychapin.org/</onlineUrl>
+<role>Principal Investigator</role>
+</personnel>
+<personnel id="RuessID">
+<individualName>
+<givenName>Roger</givenName>
+<givenName>W.</givenName>
+<surName>Ruess</surName>
+</individualName>
+<organizationName>Bonanza Creek LTER</organizationName>
+<positionName>Lead Principal Investigator</positionName>
+<address>
+<deliveryPoint>Institute of Arctic Biology  University of Alaska Fairbanks P.O. Box 757000</deliveryPoint>
+<city>Fairbanks</city>
+<administrativeArea>AK </administrativeArea>
+<postalCode>99775-0180</postalCode>
+<country>United States</country>
+</address>
+<phone phonetype="voice">(907) 474-7153</phone>
+<phone phonetype="fax">(907) 474-6967</phone>
+<electronicMailAddress>rwruess@alaska.edu</electronicMailAddress>
+<onlineUrl>http://www.iab.uaf.edu/~roger_ruess/</onlineUrl>
+<role>Principal Investigator</role>
+</personnel>
+<funding>
+<para>NSF Grant numbers DEB-1026415, DEB-0620579, DEB-0423442, DEB-0080609, DEB-9810217, DEB-9211769, DEB-8702629</para>
+<para>USDA Forest Service, Pacific Northwest Research Station (Agreement # RJVA-PNW-01-JV-11261952-231)</para>
+</funding>
+</project>
+<dataTable>
+<entityName>335_BNZ_moisturegradient_isotopestudy_2005_LTER.txt</entityName>
+<entityDescription>This dataset contains the results of a soil sampling effort undertaken in 2005 along a landscape gradient within the Bonanza Creek LTER; data includes, but is not limited to percent carbon, percent nitrogen, 13C of the gas phase, 14C of the gas phase, 13C of the solid phase, bulk density, CO2 flux and DOC.</entityDescription>
+<physical>
+<objectName>335_BNZ_moisturegradient_isotopestudy_2005_LTER.txt</objectName>
+<dataFormat>
+<textFormat>
+<numHeaderLines>1</numHeaderLines>
+<recordDelimiter>\n</recordDelimiter>
+<physicalLineDelimiter>\n</physicalLineDelimiter>
+<attributeOrientation>column</attributeOrientation>
+<simpleDelimited>
+<fieldDelimiter>,</fieldDelimiter>
+</simpleDelimited>
+</textFormat>
+</dataFormat>
+<distribution>
+<online>
+<url function="download">http://www.lter.uaf.edu/php/download_data.php?f=/ascii/files/335_BNZ_moisturegradient_isotopestudy_2005_LTER.txt</url>
+</online>
+</distribution>
+</physical>
+<attributeList>
+<attribute>
+<attributeName>Sample ID</attributeName>
+<attributeLabel>Sample ID</attributeLabel>
+<attributeDefinition>ID # given to each core taken</attributeDefinition>
+<storageType>integer</storageType>
+<measurementScale>
+<nominal>
+<nonNumericDomain>
+<textDomain>
+<definition>ID # given to each core taken</definition>
+</textDomain>
+</nonNumericDomain>
+</nominal>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>Depth</attributeName>
+<attributeLabel>Depth</attributeLabel>
+<attributeDefinition>cm below the soil surface where the core resided (either 0-5 or 5-15)</attributeDefinition>
+<storageType>string</storageType>
+<measurementScale>
+<nominal>
+<nonNumericDomain>
+<textDomain>
+<definition>cm below the soil surface where the core resided (either 0-5 or 5-15)</definition>
+</textDomain>
+</nonNumericDomain>
+</nominal>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>Warming status</attributeName>
+<attributeLabel>Warming status</attributeLabel>
+<attributeDefinition>Desgination for the experimental manipulation.  If the plot was warmed, then it is designated as such, otherwise there was no disturbance</attributeDefinition>
+<storageType>string</storageType>
+<measurementScale>
+<nominal>
+<nonNumericDomain>
+<textDomain>
+<definition>Desgination for the experimental manipulation.  If the plot was warmed, then it is designated as such, otherwise there was no disturbance</definition>
+</textDomain>
+</nonNumericDomain>
+</nominal>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>Site</attributeName>
+<attributeLabel>Site</attributeLabel>
+<attributeDefinition>Name of site for measurement.</attributeDefinition>
+<storageType>string</storageType>
+<measurementScale>
+<nominal>
+<nonNumericDomain>
+<textDomain>
+<definition>Name of site for measurement.</definition>
+</textDomain>
+</nonNumericDomain>
+</nominal>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>Sample or replicate number</attributeName>
+<attributeLabel>Sample or replicate number</attributeLabel>
+<attributeDefinition>Designates replicate</attributeDefinition>
+<storageType>integer</storageType>
+<measurementScale>
+<nominal>
+<nonNumericDomain>
+<textDomain>
+<definition>Designates replicate</definition>
+</textDomain>
+</nonNumericDomain>
+</nominal>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>Sampling Date</attributeName>
+<attributeLabel>Sampling Date</attributeLabel>
+<attributeDefinition>Day samples were collected</attributeDefinition>
+<storageType>string</storageType>
+<measurementScale>
+<dateTime>
+<formatString>mm-dd-yyyy</formatString>
+</dateTime>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName> initial (48 hrs after sample collection) CO2 ppm</attributeName>
+<attributeLabel> initial (48 hrs after sample collection) CO2 ppm</attributeLabel>
+<attributeDefinition>Mean ppm/d of CO2 based on the accumulation of sample for 48 hours after the sample was removed from the ground.</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>ppm/d</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>initial mgCO2/d</attributeName>
+<attributeLabel>initial mgCO2/d</attributeLabel>
+<attributeDefinition>Mean mg CO2/day based on the accumulation of sample for 48 hours after the sample was removed from the ground.</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>mgCO2/d</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>9 days CO2 ppm/d (mean)</attributeName>
+<attributeLabel>9 days CO2 ppm/d (mean)</attributeLabel>
+<attributeDefinition>Mean ppm/d of CO2 based on the accumulation of sample for 48 hours, 9 days after the sample was removed from the ground.</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>ppm/d</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>9 days mgCO2/d</attributeName>
+<attributeLabel>9 days mgCO2/d</attributeLabel>
+<attributeDefinition>Mean mg CO2/day based on the accumulation of sample for 48 hours, 9 days after the sample was removed from the ground.</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>mgCO2/d</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>18 days CO2 ppm/d (mean)</attributeName>
+<attributeLabel>18 days CO2 ppm/d (mean)</attributeLabel>
+<attributeDefinition>Mean ppm/d of CO2 based on the accumulation of sample for 48 hours, 12 days after the sample was removed from the ground.</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>ppm/d</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>18 days mgCO2/d</attributeName>
+<attributeLabel>18 days mgCO2/d</attributeLabel>
+<attributeDefinition>Mean mg CO2/day based on the accumulation of sample for 48 hours, 12 days after the sample was removed from the ground.</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>mgCO2/d</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>25 days CO2 ppm/d (mean)</attributeName>
+<attributeLabel>25 days CO2 ppm/d (mean)</attributeLabel>
+<attributeDefinition>Mean ppm/d of CO2 based on the accumulation of sample for 48 hours, 14 days after the sample was removed from the ground.</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>ppm/d</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>25 days mgCO2/d</attributeName>
+<attributeLabel>25 days mgCO2/d</attributeLabel>
+<attributeDefinition>Mean mg CO2/day based on the accumulation of sample for 48 hours, 14 days after the sample was removed from the ground.</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>mgCO2/d</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>31 days CO2 ppm/d (mean)</attributeName>
+<attributeLabel>31 days CO2 ppm/d (mean)</attributeLabel>
+<attributeDefinition>Mean ppm/d of CO2 based on the accumulation of sample for 48 hours, 23 days after the sample was removed from the ground.</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>ppm/d</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>31 days mgCO2/d</attributeName>
+<attributeLabel>31 days mgCO2/d</attributeLabel>
+<attributeDefinition>Mean mg CO2/day based on the accumulation of sample for 48 hours, 23 days after the sample was removed from the ground.</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>mgCO2/d</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>d13CCO2 initial (48 hours)</attributeName>
+<attributeLabel>d13CCO2 initial (48 hours)</attributeLabel>
+<attributeDefinition>stable isotope value of gaseous CO2, measured 48 hours after sample collection</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>permil</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<missingValueCode>
+<code>blank</code>
+<codeExplanation>Missing Value</codeExplanation>
+</missingValueCode>
+</attribute>
+<attribute>
+<attributeName>d13CCO2   (9 days)</attributeName>
+<attributeLabel>d13CCO2   (9 days)</attributeLabel>
+<attributeDefinition>stable isotope value of gaseous CO2, measured 9 days after sample collection</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>permil</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<missingValueCode>
+<code>blank</code>
+<codeExplanation>Missing Value</codeExplanation>
+</missingValueCode>
+</attribute>
+<attribute>
+<attributeName>d13CCO2 (31 days)</attributeName>
+<attributeLabel>d13CCO2 (31 days)</attributeLabel>
+<attributeDefinition>stable isotope value of gaseous CO2, measured 31 days after sample collection (at the end of the experiment)</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>permil</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+<attribute>
+<attributeName>?14C initial (48 hours)</attributeName>
+<attributeLabel>?14C initial (48 hours)</attributeLabel>
+<attributeDefinition>radiocarbon value of gaseous CO2, measured 48 hours after sample collection</attributeDefinition>
+<storageType>float</storageType>
+<measurementScale>
+<ratio>
+<unit>
+<customUnit>permil</customUnit>
+</unit>
+<numericDomain>
+<numberType>real</numberType>
+<!--No minimum value recorded in database (datafilevaribles/minvalid)-->
+</numericDomain>
+</ratio>
+</measurementScale>
+<!--No missing value/character in database (datafilevarible/errorcode)-->
+</attribute>
+</attributeList>
+</dataTable>
+</dataset>
+<additionalMetadata>
+ <metadata>
+ <unitList>
+<unit id="mgCO2/d"/>
+<unit id="mm-dd-yyyy"/>
+<unit id="permil"/>
+<unit id="ppm/d"/>
+<unit id="warmorblank"/>
+</unitList>
+ </metadata>
+ </additionalMetadata>
+</eml:eml>

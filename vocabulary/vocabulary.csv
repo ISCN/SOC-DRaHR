@@ -1,0 +1,7 @@
+vocab_ID, vocab_type, method
+dd-mm-yyyy, date, calendar date
+time_incubation,incubation_time,
+CO2_flux_lab_48hr, CO2_flux, incubation with 48hr cap time
+d13C_CO2_flux_lab_48hr, CO2_flux_d13C, incubation with 48hr cap time
+d14C_CO2_flux_lab_48hr, CO2_flux_d14C, incubation with 48hr cap time
+field_warming_NAC, warming, field warming treatment with unknown degree of warming
