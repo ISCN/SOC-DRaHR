@@ -28,6 +28,11 @@ Any manuscripts which use data aggregated here are asked to cite the appropreate
 Data contributes are welcome, however the data set must be previously archived elsewhere with an assigned DOI.
 Data providers are encouraged to collaborate with coders to ensure correct data ingestion.
 
+## Open data calls
+Below are active data calls that have reviewers interested in targeted data types for future manuscripts.
+
+1) Labratory incubated soil respiration response to moisture manipulation. Reviewers: K Todd-Brown and B Bond-Lamberty
+
 ## Data permissions
 Data sets with unrestricted reuse policies are priority incorperation in this project.
 Data permissions and reuse are identified in the *Study* Table.
