@@ -1,8 +1,8 @@
-#Long tail recovery project for soils
+# Long tail recovery project for soils
 
 THIS IS A DRAFT. PROJECT IS IN PRELIMINARY PHASE AND SUBJECT TO CHANGE AT ANYTIME.
 
-##Purpose
+## Purpose
 
   The purpose of this project is to aggregate data sets related to soils research. This includes field surveys, field manipulation studies, and labortory experiments. 
 The hope is that this will serve as an open community resource to uncover new mechansims and quantify effects related to soil processes that are globally generalizable.
@@ -10,7 +10,7 @@ The hope is that this will serve as an open community resource to uncover new me
 This project is not a repository or data archive.
 Currently data is restricted to those already registared with an established repository and licensed under a compatiable data use agreement.
 
-##How to contribute
+## How to contribute
 
 There are three main ways to contribut to this project:
 1) *Identify* data sets of interest
@@ -28,15 +28,15 @@ Any manuscripts which use data aggregated here are asked to cite the appropreate
 Data contributes are welcome, however the data set must be previously archived elsewhere with an assigned DOI.
 Data providers are encouraged to collaborate with coders to ensure correct data ingestion.
 
-##Data permissions
+## Data permissions
 Data sets with unrestricted reuse policies are priority incorperation in this project.
 Data permissions and reuse are identified in the *Study* Table.
 Data may be excluded from versioning due to data permissions and study authors are encouraged to check permissions before publication.
 
-##License
+## License
 The aggregation scripts here are licensed under XXX.
 
-##Table structure
+# Table structure
 Currently there are 6 main tables in this data base. 
 1) *Vocabulary* (measurement) table has measurement [measurement_ID, measurement_type, measurement_method]
 2) *Field site* has [field ID, time (collection date), depth.min, depth.max, depth.unit, latitude, longitude, description]
@@ -47,7 +47,7 @@ Currently there are 6 main tables in this data base.
 7) *Study* has [study ID, DOI, data permissions]
 
 
-#References of interest
+# References of interest
 
 rOpenSci Project: https://ropensci.github.io/
 
