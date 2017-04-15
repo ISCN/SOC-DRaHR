@@ -1,11 +1,12 @@
 library(xlsx)
 library(reshape2)
+library(plyr)
+
+source('processMethodBlock.R')
 
 ##Out of memory erros
 #header <- read.xlsx('Layers/ISCN_ALL_DATA_LAYER_C1_1-1.xlsx', sheetIndex=1, startRow=1, endRow=2)
 #data.df <- read.xlsx2('Layers/ISCN_ALL_DATA_LAYER_C1_1-1.xlsx', sheetIndex=1)
-
-header <- read.csv('Layers/ISCN_ALL_DATA_LAYER_C1_1-1.csv', nrows=1, header=FALSE)
 
 data.df <- read.csv('Layers/ISCN_ALL_DATA_LAYER_C1_1-1.csv', stringsAsFactors=FALSE)
 format(object.size(data.df), units='Mb')
@@ -17,23 +18,98 @@ format(object.size(data.df), units='Mb')
 data.df <- unique(data.df)
 format(object.size(data.df), units='Mb')
 
-vocab.df <- data.frame(header=unlist(header),
+##process the header for units
+header <- read.csv('Layers/ISCN_ALL_DATA_LAYER_C1_1-1.csv', nrows=1, header=FALSE)
+
+header.df <- data.frame(header=unlist(header),
                        measurement=gsub(' \\(.*\\)', '', unlist(header)),
                        unit=gsub('\\)', '', gsub('.* \\(', '', unlist(header))),
                        stringsAsFactors=FALSE)
-vocab.df$unit[vocab.df$measurement == vocab.df$unit] <- NA
-vocab.df$unit[grepl('ph_(cacl|h2o|other)', vocab.df$measurement)] <- 'unitless'
-vocab.df$unit[grepl('root_quant_size', vocab.df$measurement)] <- 'unitless'
-vocab.df$unit[92:95] <- 'unitless'
-vocab.df$dataNum <- 1:nrow(vocab.df)
-vocab.df$fieldNum <- c(1:22, rep(NA, length=nrow(vocab.df)-22))
-vocab.df$measureNum <- NA
-vocab.df$measureNum[!is.na(vocab.df$unit) & is.na(vocab.df$fieldNum)] <- 1+(1:sum(!is.na(vocab.df$unit) & is.na(vocab.df$fieldNum)))
-vocab.df$measureNum[grepl('layer_name', vocab.df$header)] <- 1
+header.df$unit[header.df$measurement == header.df$unit] <- NA
+header.df$unit[grepl('ph_(cacl|h2o|other)', header.df$measurement)] <- 'unitless'
+header.df$unit[grepl('root_quant_size', header.df$measurement)] <- 'unitless'
+header.df$unit[92:95] <- 'unitless'
 
-type.arr <- sort(c('bd', 'c', 'soc', 'ph', 'wpg2', 'al', 'bc', 'metal_ext', 'p', 'oc', 'loi', 'caco3', 'sand', 'silt', 'clay', 'cat_exch', 'fe', 'mn', 'ca', 'k', 'mg', 'na', 'base_sum', 'cec', 'ecec', 'bs', 'h', 'zn', 'root_quant_size', 'root_weight', '15c', '13c', '14c', 'fraction_modern', 'textureClass', 'locator_parent_alias'))
+##Set up the easy data frame
+study.df <- data.frame(studyID = header[1], doi='10.17040/ISCN/1305039', permissions='acknowledgement')
 
-repeats <- names(table(data.df$layer_name)[table(data.df$layer_name) > 1])
-field.df <- data.df[,1:22]
-measurements.df <- data.df[,c(12, 23:95)]
+lab.df <- data.frame(labID=unique(data.df[,2])) #ignore dataset_name_SOC, back out SOC later
+
+fieldTreatment.df <- data.frame(fieldTreatmentID=NA) #no field treatment
+labTreatment.df <- data.frame(labTreatmentID=NA) #no lab treatment
+
+field.df <- unique(data.df[,4:22])
+names(field.df) <- as.character(header.df$measurement[4:22])
+field.df$fieldID <- field.df$layer_name
+field.df <- melt(field.df, id.vars=c('fieldID', 'lat', 'long', 'observation_date', 
+                                     'layer_top', 'layer_bot'), 
+                         variable.name='measurement', factorsAsStrings=TRUE)
+field.df$layer_units <- 'cm'
+field.df$layer_top <- as.numeric(as.character(field.df$layer_top))
+field.df <- field.df[!grepl('^\\s*$',field.df$value),]
+
+####Pull data subsets, sampleID = fieldID = layer_name [12]
+#BulkDensity===================
+##Bulk density columns 23:28
+header.df[c(12, 23:28),]
+sampleTemp <- data.df[, c(12, 23:28)]
+names(sampleTemp) <- header.df$measurement[c(12,23:28)]
+names(sampleTemp)[1] <- 'fieldID'
+headerTemp <- header.df[c(24:27), c('measurement', 'unit')]
+
+temp <- processMethodBlock(methodNames=header.df$measurement[c(23, 28)],
+                           sampleTemp=sampleTemp, headerInfo=headerTemp)
+
+#merge results
+measurement.df <- temp$measurement
+sample.df <- temp$sample
+
+#CARBON=====================
+##Carbon, columns 29-33
+header.df[c(12, 29:33),]
+sampleTemp <- data.df[, c(12, 29:33)]
+names(sampleTemp) <- header.df$measurement[c(12,29:33)]
+names(sampleTemp)[1] <- 'fieldID'
+headerTemp <- header.df[c(31:33), c('measurement', 'unit')]
+
+temp <- processMethodBlock(methodNames=header.df$measurement[29:30],
+                           sampleTemp=sampleTemp, headerInfo=headerTemp)
+
+#merge results
+measurement.df <- rbind.fill(measurement.df, temp$measurement)
+sample.df <- rbind.fill(sample.df, temp$sample)
+
+#=============================
+##Nitrogen, columns 34-35
+###TODO what method is associated with this?
+header.df[c(12, 34:35),]
+sampleTemp <- data.df[, c(12, 34:35)]
+names(sampleTemp) <- header.df$measurement[c(12,34:35)]
+names(sampleTemp)[1] <- 'fieldID'
+headerTemp <- header.df[c(34:35), c('measurement', 'unit')]
+
+temp <- processMethodBlock(methodNames=NULL,
+                           sampleTemp=sampleTemp, headerInfo=headerTemp)
+
+#merge results
+measurement.df <- rbind.fill(measurement.df, temp$measurement)
+sample.df <- rbind.fill(sample.df, temp$sample)
+
+##SOC, columns 36-38
+##pH, columns 39-42
+##CaCO3, column 43
+##Texture, columns 44, 46
+##WPG2, columns 47 48
+##Al, columns 50, 52, 59, 60
+##Fe, columns 53, 55, 59, 60
+##Mn, columns 56, 58, 59 ??60
+##BC, columns 61:67
+##CEC_h, columns 68:71
+##bs, columns 72:73
+##metal_ext, columns 74:77
+##P, columns 78:83
+##Root, column 84:85
+##Isotope, 86:93
+##textureClass, 94
+##locator, 95
 
