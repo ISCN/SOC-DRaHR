@@ -96,6 +96,19 @@ measurement.df <- rbind.fill(measurement.df, temp$measurement)
 sample.df <- rbind.fill(sample.df, temp$sample)
 
 ##SOC, columns 36-38
+header.df[c(12, 36:38),]
+sampleTemp <- data.df[, c(12, 36:38)]
+names(sampleTemp) <- header.df$measurement[c(12,36:38)]
+names(sampleTemp)[1] <- 'fieldID'
+headerTemp <- header.df[c(36), c('measurement', 'unit')]
+
+temp <- processMethodBlock(methodNames=header.df$measurement[c(37:38)],
+                           sampleTemp=sampleTemp, headerInfo=headerTemp)
+
+#merge results
+measurement.df <- rbind.fill(measurement.df, temp$measurement)
+sample.df <- rbind.fill(sample.df, temp$sample)
+
 ##pH, columns 39-42
 ##CaCO3, column 43
 ##Texture, columns 44, 46
