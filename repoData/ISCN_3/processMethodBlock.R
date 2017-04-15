@@ -24,7 +24,8 @@ processMethodBlock <- function(methodNames=NULL,
   measurementTemp <- unique(sampleTemp[c('measurement','method')])
   measurementTemp$measurementID <- sprintf('%s_%02d', measurementTemp$measurement, 
                                            1:nrow(measurementTemp))
-  sampleTemp <- merge(sampleTemp, measurementTemp)[, c('fieldID', 'measurementID', 'value')]
+  sampleTemp <- merge(sampleTemp, measurementTemp)[, c('fieldID', 'measurementID',
+                                                       'value', 'unit')]
   
   #rename stuff
   names(measurementTemp)[1] <- 'type'
