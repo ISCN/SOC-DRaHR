@@ -1,23 +1,25 @@
 library(xlsx)
 library(reshape2)
 library(plyr)
-processData_ISCN3 <- function(){
-  source('repoData/ISCN_3/processWorksheet.R')
+processData_ISCN3 <- function(dir='repoData/ISCN_3'){
+  
+  source(sprintf('%s/processMethodBlock.R', dir))
+  source(sprintf('%s/processWorksheet.R', dir))
   
   data1.ls <- processWorksheet(csvFile=
-                                 'repoData/ISCN_3/Layers/ISCN_ALL_DATA_LAYER_C1_1-1.csv',
+                                 sprintf('%s/Layers/ISCN_ALL_DATA_LAYER_C1_1-1.csv', dir),
                                verbose=TRUE)
   
   data2.ls <- processWorksheet(csvFile=
-                                 'repoData/ISCN_3/Layers/ISCN_ALL_DATA_LAYER_C2_1-1.csv',
+                                 sprintf('%s/Layers/ISCN_ALL_DATA_LAYER_C2_1-1.csv', dir),
                                verbose=TRUE)
   
   data3.ls <- processWorksheet(csvFile=
-                                 'repoData/ISCN_3/Layers/ISCN_ALL_DATA_LAYER_C3_1-1.csv',
+                                 sprintf('%s/Layers/ISCN_ALL_DATA_LAYER_C3_1-1.csv', dir),
                                verbose=TRUE)
   
   data4.ls <- processWorksheet(csvFile=
-                                 'repoData/ISCN_3/Layers/ISCN_ALL_DATA_LAYER_C4_1-1.csv',
+                                 sprintf('%s/Layers/ISCN_ALL_DATA_LAYER_C4_1-1.csv', dir),
                                verbose=TRUE)
   #merge easy========
   study.df <- data1.ls$study
