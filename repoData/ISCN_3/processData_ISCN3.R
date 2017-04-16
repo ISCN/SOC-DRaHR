@@ -87,7 +87,10 @@ processData_ISCN3 <- function(){
                             return(xx)
                           }))
   sample.df$fieldID <- as.factor(sample.df$fieldID)
+  sample.df$measurementID <- as.factor(sample.df$measurementID)
+  sample.df$unit <- as.factor(sample.df$unit)
   
   return(list(study=study.df, labTreatment=labTreatment.df, fieldTreatment=fieldTreatment.df,
-              fieldNotes=fieldNotes.df, measurement=measureTemp.df, sample=sample.df))
+              field=field.df, fieldNotes=fieldNotes.df, measurement=measurement.df, 
+              sample=sample.df))
 }
