@@ -1,128 +1,93 @@
 library(xlsx)
 library(reshape2)
 library(plyr)
-
-source('processMethodBlock.R')
-
-##Out of memory erros
-#header <- read.xlsx('Layers/ISCN_ALL_DATA_LAYER_C1_1-1.xlsx', sheetIndex=1, startRow=1, endRow=2)
-#data.df <- read.xlsx2('Layers/ISCN_ALL_DATA_LAYER_C1_1-1.xlsx', sheetIndex=1)
-
-data.df <- read.csv('Layers/ISCN_ALL_DATA_LAYER_C1_1-1.csv', stringsAsFactors=FALSE)
-format(object.size(data.df), units='Mb')
-
-#trim replicates
-data.df <- subset(data.df, !grepl('ISCN SOC stock', dataset_name_soc))
-format(object.size(data.df), units='Mb')
-
-data.df <- unique(data.df)
-format(object.size(data.df), units='Mb')
-
-##process the header for units
-header <- read.csv('Layers/ISCN_ALL_DATA_LAYER_C1_1-1.csv', nrows=1, header=FALSE)
-
-header.df <- data.frame(header=unlist(header),
-                       measurement=gsub(' \\(.*\\)', '', unlist(header)),
-                       unit=gsub('\\)', '', gsub('.* \\(', '', unlist(header))),
-                       stringsAsFactors=FALSE)
-header.df$unit[header.df$measurement == header.df$unit] <- NA
-header.df$unit[grepl('ph_(cacl|h2o|other)', header.df$measurement)] <- 'unitless'
-header.df$unit[grepl('root_quant_size', header.df$measurement)] <- 'unitless'
-header.df$unit[92:95] <- 'unitless'
-
-##Set up the easy data frame
-study.df <- data.frame(studyID = header[1], doi='10.17040/ISCN/1305039', permissions='acknowledgement')
-
-lab.df <- data.frame(labID=unique(data.df[,2])) #ignore dataset_name_SOC, back out SOC later
-
-fieldTreatment.df <- data.frame(fieldTreatmentID=NA) #no field treatment
-labTreatment.df <- data.frame(labTreatmentID=NA) #no lab treatment
-
-field.df <- unique(data.df[,4:22])
-names(field.df) <- as.character(header.df$measurement[4:22])
-field.df$fieldID <- field.df$layer_name
-field.df <- melt(field.df, id.vars=c('fieldID', 'lat', 'long', 'observation_date', 
-                                     'layer_top', 'layer_bot'), 
-                         variable.name='measurement', factorsAsStrings=TRUE)
-field.df$layer_units <- 'cm'
-field.df$layer_top <- as.numeric(as.character(field.df$layer_top))
-field.df <- field.df[!grepl('^\\s*$',field.df$value),]
-
-####Pull data subsets, sampleID = fieldID = layer_name [12]
-#BulkDensity===================
-##Bulk density columns 23:28
-header.df[c(12, 23:28),]
-sampleTemp <- data.df[, c(12, 23:28)]
-names(sampleTemp) <- header.df$measurement[c(12,23:28)]
-names(sampleTemp)[1] <- 'fieldID'
-headerTemp <- header.df[c(24:27), c('measurement', 'unit')]
-
-temp <- processMethodBlock(methodNames=header.df$measurement[c(23, 28)],
-                           sampleTemp=sampleTemp, headerInfo=headerTemp)
-
-#merge results
-measurement.df <- temp$measurement
-sample.df <- temp$sample
-
-#CARBON=====================
-##Carbon, columns 29-33
-header.df[c(12, 29:33),]
-sampleTemp <- data.df[, c(12, 29:33)]
-names(sampleTemp) <- header.df$measurement[c(12,29:33)]
-names(sampleTemp)[1] <- 'fieldID'
-headerTemp <- header.df[c(31:33), c('measurement', 'unit')]
-
-temp <- processMethodBlock(methodNames=header.df$measurement[29:30],
-                           sampleTemp=sampleTemp, headerInfo=headerTemp)
-
-#merge results
-measurement.df <- rbind.fill(measurement.df, temp$measurement)
-sample.df <- rbind.fill(sample.df, temp$sample)
-
-#=============================
-##Nitrogen, columns 34-35
-###TODO what method is associated with this?
-header.df[c(12, 34:35),]
-sampleTemp <- data.df[, c(12, 34:35)]
-names(sampleTemp) <- header.df$measurement[c(12,34:35)]
-names(sampleTemp)[1] <- 'fieldID'
-headerTemp <- header.df[c(34:35), c('measurement', 'unit')]
-
-temp <- processMethodBlock(methodNames=NULL,
-                           sampleTemp=sampleTemp, headerInfo=headerTemp)
-
-#merge results
-measurement.df <- rbind.fill(measurement.df, temp$measurement)
-sample.df <- rbind.fill(sample.df, temp$sample)
-
-##SOC, columns 36-38
-header.df[c(12, 36:38),]
-sampleTemp <- data.df[, c(12, 36:38)]
-names(sampleTemp) <- header.df$measurement[c(12,36:38)]
-names(sampleTemp)[1] <- 'fieldID'
-headerTemp <- header.df[c(36), c('measurement', 'unit')]
-
-temp <- processMethodBlock(methodNames=header.df$measurement[c(37:38)],
-                           sampleTemp=sampleTemp, headerInfo=headerTemp)
-
-#merge results
-measurement.df <- rbind.fill(measurement.df, temp$measurement)
-sample.df <- rbind.fill(sample.df, temp$sample)
-
-##pH, columns 39-42
-##CaCO3, column 43
-##Texture, columns 44, 46
-##WPG2, columns 47 48
-##Al, columns 50, 52, 59, 60
-##Fe, columns 53, 55, 59, 60
-##Mn, columns 56, 58, 59 ??60
-##BC, columns 61:67
-##CEC_h, columns 68:71
-##bs, columns 72:73
-##metal_ext, columns 74:77
-##P, columns 78:83
-##Root, column 84:85
-##Isotope, 86:93
-##textureClass, 94
-##locator, 95
-
+processData_ISCN3 <- function(){
+  source('repoData/ISCN_3/processWorksheet.R')
+  
+  data1.ls <- processWorksheet(csvFile=
+                                 'repoData/ISCN_3/Layers/ISCN_ALL_DATA_LAYER_C1_1-1.csv',
+                               verbose=TRUE)
+  
+  data2.ls <- processWorksheet(csvFile=
+                                 'repoData/ISCN_3/Layers/ISCN_ALL_DATA_LAYER_C2_1-1.csv',
+                               verbose=TRUE)
+  
+  data3.ls <- processWorksheet(csvFile=
+                                 'repoData/ISCN_3/Layers/ISCN_ALL_DATA_LAYER_C3_1-1.csv',
+                               verbose=TRUE)
+  
+  data4.ls <- processWorksheet(csvFile=
+                                 'repoData/ISCN_3/Layers/ISCN_ALL_DATA_LAYER_C4_1-1.csv',
+                               verbose=TRUE)
+  #merge easy========
+  study.df <- data1.ls$study
+  fieldTreatment.df <- data1.ls$fieldTreatment
+  labTreatment.df <- data1.ls$labTreatment
+  
+  lab.df <- unique(rbind.fill(rbind.fill(rbind.fill(data1.ls$lab,data2.ls$lab), 
+                                         data3.ls$lab), data4.ls$lab))
+  
+  field.df <- unique(rbind.fill(rbind.fill(rbind.fill(data1.ls$field,data2.ls$field), 
+                                           data3.ls$field), data4.ls$field))
+  field.df$value <- as.factor(field.df$value)
+  field.df$layer_units <- as.factor(field.df$layer_units)
+  
+  
+  fieldNotes.df <- field.df[,c('fieldID', 'measurement', 'value')]
+  field.df <- unique(field.df[,c('fieldID', 'lat', 'long', 'observation_date', 
+                                 'layer_top', 'layer_bot', 'layer_units')])
+  #mergeMeasures====
+  measureTemp.df <- 
+    merge(merge(data1.ls$measurement, data2.ls$measurement, by=c('type', 'method'), 
+                suffixes=c('.data1', '.data2'), all=TRUE),
+          merge(data3.ls$measurement, data4.ls$measurement, by=c('type', 'method'), 
+                suffixes=c('.data3', '.data4'), all=TRUE), all=TRUE)
+  
+  measureTemp.df <- ddply(measureTemp.df, c('type'), function(xx){
+    xx$measurementID <- sprintf('%s_%02d', xx$type, 1:nrow(xx))
+    return(xx)
+  })
+  measurement.df <- measureTemp.df[,c('type', 'method', 'measurementID')]
+  
+  #Construct samples========
+  sample.df <- ddply(data1.ls$samples, 'measurementID', function(xx){
+    #cat('replacing [', xx$measurementID[1])
+    xx$measurementID <- subset(measureTemp.df,
+                               xx$measurementID[1] == measurementID.data1)$measurementID
+    #cat('] with [',xx$measurementID[1],']\n')
+    return(xx)
+  })
+  
+  sample.df <- rbind.fill(sample.df, 
+                          ddply(data2.ls$samples, 'measurementID', function(xx){
+                            #cat('replacing [', xx$measurementID[1])
+                            xx$measurementID <- subset(measureTemp.df,
+                                                       xx$measurementID[1] ==
+                                                         measurementID.data2)$measurementID
+                            #cat('] with [',xx$measurementID[1],']\n')
+                            return(xx)
+                          }))
+  
+  sample.df <- rbind.fill(sample.df, 
+                          ddply(data3.ls$samples, 'measurementID', function(xx){
+                            #cat('replacing [', xx$measurementID[1])
+                            xx$measurementID <- subset(measureTemp.df,
+                                                       xx$measurementID[1] == 
+                                                         measurementID.data3)$measurementID
+                            #cat('] with [',xx$measurementID[1],']\n')
+                            return(xx)
+                          }))
+  
+  sample.df <- rbind.fill(sample.df, 
+                          ddply(data4.ls$samples, 'measurementID', function(xx){
+                            #cat('replacing [', xx$measurementID[1])
+                            xx$measurementID <- subset(measureTemp.df,
+                                                       xx$measurementID[1] == measurementID.data4)$measurementID
+                            #cat('] with [',xx$measurementID[1],']\n')
+                            return(xx)
+                          }))
+  sample.df$fieldID <- as.factor(sample.df$fieldID)
+  
+  return(list(study=study.df, labTreatment=labTreatment.df, fieldTreatment=fieldTreatment.df,
+              fieldNotes=fieldNotes.df, measurement=measureTemp.df, sample=sample.df))
+}

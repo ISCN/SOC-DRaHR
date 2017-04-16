@@ -1,5 +1,5 @@
-processMethodBlock <- function(methodNames=NULL, 
-                               sampleTemp, headerInfo){
+processMethodBlock <- function(methodNames=NULL, unitName=NULL,
+                               sampleTemp, unit.df=NULL){
   
   ##Merge methods
   sampleTemp$method <- ''
@@ -13,12 +13,18 @@ processMethodBlock <- function(methodNames=NULL,
   }
   
   #melt values
-  sampleTemp <- melt(sampleTemp, id.vars=c('fieldID', 'method'), 
+  sampleTemp <- melt(sampleTemp, id.vars=c(c('fieldID', 'method'), unitName), 
                      variable.name='measurement', 
-                     na.rm=TRUE)
+                     na.rm=TRUE, forceNumericValue=TRUE)
   
-  #units
-  sampleTemp <- merge(sampleTemp, headerInfo[,c('measurement', 'unit')])
+  if(!is.null(unitName)){
+    names(sampleTemp)[3] <- 'unit'
+  }else if(is.null(unitName) & !is.null(unit.df)){
+    #units
+    sampleTemp <- merge(sampleTemp, unit.df[,c('measurement', 'unit')])
+  }else{
+    warning('units not specified')
+  }
   
   #issolate unique measurements
   measurementTemp <- unique(sampleTemp[c('measurement','method')])
@@ -29,6 +35,8 @@ processMethodBlock <- function(methodNames=NULL,
   
   #rename stuff
   names(measurementTemp)[1] <- 'type'
+  
+  sampleTemp$value <- as.numeric(sampleTemp$value)
   
   return(list(sample=sampleTemp, measurement=measurementTemp))
   
