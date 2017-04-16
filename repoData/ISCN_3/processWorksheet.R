@@ -1,8 +1,5 @@
 processWorksheet <- function(csvFile='Layers/ISCN_ALL_DATA_LAYER_C1_1-1.csv',
                              verbose=TRUE){
-  
-  source('repoData/ISCN_3/processMethodBlock.R')
-  
   ##Out of memory erros
   #header <- read.xlsx('Layers/ISCN_ALL_DATA_LAYER_C1_1-1.xlsx', sheetIndex=1, startRow=1, endRow=2)
   #data.df <- read.xlsx2('Layers/ISCN_ALL_DATA_LAYER_C1_1-1.xlsx', sheetIndex=1)
