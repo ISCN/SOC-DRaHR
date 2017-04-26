@@ -1,7 +1,7 @@
 ---
 title: "ISCN viz"
 author: "K Todd-Brown (ktoddbrown@gmail.com)"
-date: "4/16/2017"
+date: "4/26/2017"
 output:
   pdf_document: 
     fig_caption: yes
@@ -15,6 +15,7 @@ library(ggmap)
 library(maps)
 library(mapdata)
 library(plyr)
+library(fiftystater)
 ```
 
 ```{r loadData}
@@ -33,6 +34,79 @@ ggplot(unique(ISCN3$field[, c('lat', 'long')])) +
   mapWorld + 
   geom_hex(aes(x=long, y=lat), bins=200) + 
   scale_fill_gradient(trans='log10')
+```
+```{r mapSiteByArea}
+noLatLon <- unique(subset(ISCN3$field, is.na(lat+long))$fieldID)
+
+stateCounts <- ddply(subset(ISCN3$fieldNotes, measurement == 'state' & fieldID %in% noLatLon), c('value'), summarize, count=length(unique(fieldID)))
+names(stateCounts)[1] <- 'state'
+stateCounts$state <- tolower(stateCounts$state)
+stateCounts <- subset(stateCounts, state %in% fifty_states$id)
+
+
+ggplot(stateCounts, aes(map_id = state)) +
+  geom_map(aes(fill=count), map=fifty_states) +
+  expand_limits(x = fifty_states$long, y = fifty_states$lat) +
+  coord_map() +
+  scale_x_continuous(breaks = NULL) + 
+  scale_y_continuous(breaks = NULL) +
+  scale_fill_gradient(trans='log10') +
+  labs(x = "", y = "") +
+  theme(legend.position = "bottom", 
+        panel.background = element_blank())
+
+countryCounts <- ddply(subset(ISCN3$fieldNotes, measurement == 'country' & fieldID %in% noLatLon), c('value'), summarize, count=length(unique(fieldID)))
+names(countryCounts)[1] <- 'region'
+countryCounts$region <- as.character(countryCounts$region)
+countryCounts$region[grepl('United States', countryCounts$region)] <- 'USA'
+
+map.world <- map_data(map="world")
+
+missingCountries <- data.frame(region=setdiff(map.world$region, countryCounts$value), count=NA)
+countryCounts <- rbind(countryCounts, missingCountries)
+#map.world <- merge(map.world, countryCounts, all=TRUE)
+ggplot(countryCounts, aes(map_id = region)) +
+  geom_map(aes(fill=count), map=map.world) +
+  expand_limits(x = map.world$long, y = map.world$lat) +
+  coord_cartesian(xlim=c(-180,180), ylim=c(-90,90)) +
+  scale_x_continuous(breaks = NULL) + 
+  scale_y_continuous(breaks = NULL) +
+  scale_fill_gradient(trans='log10') +
+  labs(x = "", y = "") +
+  theme(legend.position = "bottom", 
+        panel.background = element_blank())
+
+
+
+```
+
+`r nrow(subset(subset(ISCN3$fieldNotes, measurement == 'country' & fieldID %in% noLatLon),
+            value=='Unknown'))` ites with no known country.
+
+##Total country counts
+```{r totCountryCount}
+countryCounts <- ddply(subset(ISCN3$fieldNotes, measurement == 'country'), c('value'), summarize, count=length(unique(fieldID)))
+names(countryCounts)[1] <- 'region'
+countryCounts$region <- as.character(countryCounts$region)
+countryCounts$region[grepl('United States', countryCounts$region)] <- 'USA'
+
+
+map.world <- map_data(map="world")
+
+missingCountries <- data.frame(region=setdiff(map.world$region, countryCounts$region), count=NA)
+setdiff(countryCounts$region, map.world$region)
+countryCounts <- rbind(countryCounts, missingCountries)
+#map.world <- merge(map.world, countryCounts, all=TRUE)
+ggplot(countryCounts, aes(map_id = region)) +
+  geom_map(aes(fill=count), map=map.world) +
+  expand_limits(x = map.world$long, y = map.world$lat) +
+  coord_cartesian(xlim=c(-180,180), ylim=c(-90,90)) +
+  scale_x_continuous(breaks = NULL) + 
+  scale_y_continuous(breaks = NULL) +
+  scale_fill_gradient(trans='log10') +
+  labs(x = "", y = "") +
+  theme(legend.position = "bottom", 
+        panel.background = element_blank())
 ```
 
 #Histograms of measurements
