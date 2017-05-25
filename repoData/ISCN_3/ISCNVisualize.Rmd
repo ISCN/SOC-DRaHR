@@ -113,19 +113,41 @@ ggplot(countryCounts, aes(map_id = region)) +
 ```{r types}
 unique(ISCN3$measurement$type)
 ```
+Most of the data is from NRCS (soil characterization database) Sept 2014 version of data base. 
 
+All measurements are on oven dry soils and in mass percent where percent noted.
+
+##Bulk density
+
++ bd_samp is the bulk density of the <2mm (fine earth) fraction, in which the mass is expressed on an oven-dry (105 deg) basis. This is the best form of Db for the most uses.
++ bd_tot is the whole soil bulk density, includes fine earth fraction and rocks.
++ bd_whole is the bulk density of the whole soil (coarse frags, if present, included), expressed on a 1/3 bar moisture content (a little drier than typical field moist, but not oven-dry). It is collected by the clod method. For a variety of reasons, including the presence of water, possible coarse frags, and the tendency of clods to cleave along pore spaces, this will overestimate Db relative to bd_samp. The SSL standard method here is 4A1d if you want to look it up.
++ bd_other is, for data contributed by NRCS SSL, the bulk density of the fine earth fraction, but expressed on a field moist condition. It is collected by a volumetric core, but given the presence of some water, will probably usually be an overestimate relative to the bd_samp. This corresponds to the SSL standard method 4A3a. For datasets contributed by sources other than NRCS, bd_other is anyone's guess. Hopefully specified in the associated bd_method variable, or the metadata sheet for that dataset.
+
+Reasonable BD minimum 0.03 or lower and maximum 2.7 g cm-3. 
 ```{r BD}
-ggplot(merge(subset(ISCN3$sample, grepl('^bd_', measurementID) & value > 0 & value < 10),
-             ISCN3$measurement)) +
+plot.df <- merge(subset(ISCN3$sample, grepl('^bd_', measurementID) & 
+                          value > 0 & value < 10), ISCN3$measurement)
+ggplot(plot.df) +
   geom_histogram(aes(x=value, y=..density..)) + 
   scale_x_log10() + 
   facet_wrap(type~unit)
 
-summary(subset(ISCN3$sample, grepl('^bd_', measurementID) & (value < 0 | value > 10)))
+summary(plot.df)
 ```
 
-```{r C_OC_LOI}
-ggplot(merge(subset(ISCN3$sample, grepl('^(c_|oc|loi)', measurementID) & value > 0),
+Number of samples for BD `r length(plot.df$value)`.
+
+##C OC LOI SOC
+
++c_tot carbon concentration in a dry combustion analysis, sometimes include inorganic carbon
++oc organic carbon concentration from either acidified (to remove carbonates) and then ran on dry combustion analyizer, or (more common) wet oxidation 'Walkly-Black' dicromate oxidation, chemical digest for organic carbon; old methods 1930-1990s tends to over estimate it in certain soils. pH below 7 c_tot generally == oc otherwise you might have carbonates
++loi loss on ignition uncorrected for C:organics, generally close to half for O-horizon, C about a third of the LOI for lower horizons.
+
++soc calculated soil carbon stock of layer/profile
+
+```{r C_OC_LOI_SOC}
+ggplot(merge(subset(ISCN3$sample, grepl('^(c_|oc|loi|soc)', measurementID) & value > 0),
              ISCN3$measurement)) +
   geom_histogram(aes(x=value, y=..density..)) + 
   scale_x_log10() + 
@@ -134,6 +156,9 @@ ggplot(merge(subset(ISCN3$sample, grepl('^(c_|oc|loi)', measurementID) & value >
 summary(subset(ISCN3$sample, grepl('^(c_|oc|loi)', measurementID) & (value < 0)))
 ```
 
+## Nitrogen
++ n_tot most N is organic mass percent dry weight, probably estimated by dry combustion (Dumas methods), sometimes also Kjeldahl digestion converts N to nitrate and then measures nitrate.
+
 ```{r N}
 ggplot(merge(subset(ISCN3$sample, grepl('^n_', measurementID) & value > 0),
              ISCN3$measurement)) +
@@ -141,6 +166,12 @@ ggplot(merge(subset(ISCN3$sample, grepl('^n_', measurementID) & value > 0),
   scale_x_log10() + 
   facet_wrap(type~unit)
 ```
+
+## pH
+
++ ph_cacl calsium cloride slury in the NRCS documentation
++ ph_h2o water slury in the NRCS documentation
++ ph_other non standard catch all
 
 ```{r pH}
 ggplot(merge(subset(ISCN3$sample, grepl('^ph_', measurementID) & value > 1.5),
@@ -152,6 +183,9 @@ ggplot(merge(subset(ISCN3$sample, grepl('^ph_', measurementID) & value > 1.5),
 summary(subset(ISCN3$sample, grepl('^ph_', measurementID) & (value <= 1.5)))
 ```
 
+## CaCO3 
+Percent inorganic carbon in a sample.
+Standard methods from NRCS SSL (SoiL Survey Manual, R Burt) manual
 ```{r CaCO3}
 
 ggplot(merge(subset(ISCN3$sample, grepl('^caco3', measurementID) & value > 0),
@@ -163,6 +197,10 @@ ggplot(merge(subset(ISCN3$sample, grepl('^caco3', measurementID) & value > 0),
 summary(subset(ISCN3$sample, grepl('^caco3', measurementID) & (value <= 0)))
 
 ```
+
+##Sand, clay slit
+Partical size analysis. 
+Methods might not be completely annotated.
 
 ```{r Texture}
 
@@ -176,7 +214,11 @@ summary(subset(ISCN3$sample, grepl('tot_psa', measurementID) & (value < 0)))
 
 ```
 
-```{r cat_wpg}
+##Cation exchange capasity
+We don't specify extrat solution, protocol in SSL. 
+Only for NRCS data in vs ISCN3.
+
+```{r cat_exch}
 
 ggplot(merge(subset(ISCN3$sample, grepl('(cat_exch)', measurementID)& (value > 0)),
              ISCN3$measurement)) +
@@ -189,6 +231,8 @@ summary(subset(ISCN3$sample, grepl('(cat_exch)', measurementID) & (value <= 0)))
 subset(ISCN3$measurement,grepl('(cat_exch)', measurementID))
 ```
 
+## Percent coarse fragement content
+By weight coarse fragment (>2mm) content. Inherited SSL nominclature
 ```{r wpg}
 ggplot(merge(subset(ISCN3$sample, grepl('wpg2', measurementID) & value > 0),
              ISCN3$measurement)) +
@@ -199,6 +243,11 @@ ggplot(merge(subset(ISCN3$sample, grepl('wpg2', measurementID) & value > 0),
 #summary(summary(subset(ISCN3$sample, grepl('wpg2', measurementID) & (value <= 0))))
 ```
 
+## Metal extracts
+bc_* - base cation exchange
+We don't specify extrat solution, protocol in SSL. National Corroporative Soil Survey data base details in Soil Survey Lab methods (SSL).
+_dith vs _ox - differnt organic extractent. Might not be comparable across extractents. Selection is reflectent of different mineralogies.
+Only for NRCS data in vs ISCN3.
 ```{r metals_percent}
 ggplot(merge(subset(ISCN3$sample, 
                     grepl('^(al|fe|mn|ca|k|mg|na|p)_', measurementID) &
@@ -211,6 +260,7 @@ ggplot(merge(subset(ISCN3$sample,
 summary(subset(ISCN3$sample, grepl('^(al|fe|mn|ca|k|mg|na|p)_', measurementID) &
                       !grepl('ext', measurementID) & (value > 100)))
 ```
+
 ```{r metals_ext}
 ggplot(merge(subset(ISCN3$sample, grepl('ext', measurementID) & value > 0),
              ISCN3$measurement)) +
@@ -220,6 +270,17 @@ ggplot(merge(subset(ISCN3$sample, grepl('ext', measurementID) & value > 0),
 
 summary(subset(ISCN3$sample, grepl('ext', measurementID) & (value <= 0)))
 ```
+
+## Cation exchange
+NRCS variables
+bs - sum of sum of all base cation exchange
+bs_sum - alternative 2 calculation of sum of all base cation exchange
+
+base_sum - 
+
+cec_sum - cation exchange by different method
+ecec - effective cation exchange capasity (standarized soil pH)
+h_ext - exchangable acidity
 
 ```{r base_cec}
 #base_sum     cec_sum      ecec         bs           bs_sum 
@@ -244,6 +305,8 @@ ggplot(merge(subset(ISCN3$sample, grepl('^bs_', measurementID)),
 #summary(subset(ISCN3$sample, grepl('^bs_', measurementID)))
 ```
 
+
+
 ```{r isotope}
 #15n          13c          14c
 ggplot(merge(subset(ISCN3$sample, grepl('^1[345]', measurementID)),
@@ -254,3 +317,6 @@ ggplot(merge(subset(ISCN3$sample, grepl('^1[345]', measurementID)),
 
 summary(subset(ISCN3$sample, grepl('^1[345]', measurementID)))
 ```
+
+#Locator_parent_alias 
+ties back to old site name in NRCS
