@@ -3,13 +3,14 @@ title: "ISCN viz"
 author: "K Todd-Brown (ktoddbrown@gmail.com)"
 date: "4/26/2017"
 output:
-  pdf_document: 
+  html_document: default
+  pdf_document:
     fig_caption: yes
     toc: yes
-  html_document: default
 ---
 
 ```{r setup}
+library(SoilDataR)
 library(ggplot2)
 library(ggmap)
 library(maps)
@@ -19,9 +20,7 @@ library(fiftystater)
 ```
 
 ```{r loadData}
-source('./processData_ISCN3.R')
-
-ISCN3 <- processData_ISCN3(dir='.')
+ISCN3 <- processData_ISCN3(dir='../repoData/ISCN_3/')
 ```
 
 
