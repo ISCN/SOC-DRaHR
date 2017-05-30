@@ -17,6 +17,7 @@ Much of the data is from [NRCS](https://www.nrcs.usda.gov/wps/portal/nrcs/site/s
 library(SoilDataR) #library(devtools); install_github("ktoddbrown/soilDataR")
 library(ggplot2) #make pretty plots
 library(plyr) #data management
+library(knitr)
 
 #mapping librarys to help with global/regional plots
 library(ggmap)
@@ -46,11 +47,13 @@ ggplot(unique(ISCN3$field[, c('lat', 'long')])) +
 ```{r statemap}
 noLatLon <- unique(subset(ISCN3$field, is.na(lat+long))$fieldID)
 
-stateCounts <- ddply(subset(ISCN3$fieldNotes, measurement == 'state' & fieldID %in% noLatLon), c('value'), summarize, count=length(unique(fieldID)))
-names(stateCounts)[1] <- 'state'
+stateCounts <- ddply(subset(ISCN3$field, is.na(lat+long)), c('state'), 
+                     summarize, count=length(unique(fieldID)))
 stateCounts$state <- tolower(stateCounts$state)
-stateCounts <- subset(stateCounts, state %in% fifty_states$id)
 
+cat('Following are not considered states:\n')
+kable(subset(stateCounts, ! state %in% fifty_states$id))
+stateCounts <- subset(stateCounts, state %in% fifty_states$id)
 
 ggplot(stateCounts, aes(map_id = state)) +
   geom_map(aes(fill=count), map=fifty_states) +
@@ -66,13 +69,15 @@ ggplot(stateCounts, aes(map_id = state)) +
 
 ## Sites with country but no lat-lon
 ```{r countryMap}
-countryCounts <- ddply(subset(ISCN3$fieldNotes, measurement == 'country' & fieldID %in% noLatLon), c('value'), summarize, count=length(unique(fieldID)))
+countryCounts <- ddply(subset(ISCN3$field, is.na(lat+long)), 'country',  summarize, count=length(unique(fieldID)))
 names(countryCounts)[1] <- 'region'
 countryCounts$region <- as.character(countryCounts$region)
 countryCounts$region[grepl('United States', countryCounts$region)] <- 'USA'
 
 map.world <- map_data(map="world")
 
+cat('These countries are unknown to the map\n')
+kable(subset(countryCounts, ! region %in% map.world$region))
 missingCountries <- data.frame(region=setdiff(map.world$region, countryCounts$value), count=NA)
 countryCounts <- rbind(countryCounts, missingCountries)
 #map.world <- merge(map.world, countryCounts, all=TRUE)
@@ -88,17 +93,14 @@ ggplot(countryCounts, aes(map_id = region)) +
         panel.background = element_blank())
 ```
 
-`r nrow(unique(subset(
-    subset(ISCN3$fieldNotes, measurement == 'country' & fieldID %in% noLatLon),
-            value=='Unknown')))` sites with no known country nor lat-lon.
+`r nrow(unique(subset(ISCN3$field, (country=='Unknown' | country == '') & is.na(lat+long), select=c('fieldID'))))` sites with no known country nor lat-lon.
 
 ## Site count by country map (include sites w/ lat-lon)
 ```{r totCountryCount}
-countryCounts <- ddply(subset(ISCN3$fieldNotes, measurement == 'country'), c('value'), summarize, count=length(unique(fieldID)))
+countryCounts <- ddply(ISCN3$field, 'country', summarize, count=length(unique(fieldID)))
 names(countryCounts)[1] <- 'region'
 countryCounts$region <- as.character(countryCounts$region)
 countryCounts$region[grepl('United States', countryCounts$region)] <- 'USA'
-
 
 map.world <- map_data(map="world")
 
@@ -150,13 +152,16 @@ summary(subset(ISCN3$sample, grepl('^soc', measurementID) & (value < 0)))
 Reasonable BD minimum 0.03 or lower and maximum 2.7 g cm-3. 
 ```{r BD}
 plot.df <- merge(subset(ISCN3$sample, grepl('^bd_', measurementID) & 
-                          value > 0 & value < 10), ISCN3$measurement)
+                          value > 0 & value < 2.7), ISCN3$measurement)
 ggplot(plot.df) +
   geom_histogram(aes(x=value, y=..density..)) + 
-  scale_x_log10() + 
+  #scale_x_log10() + 
   facet_wrap(type~unit)
 
-summary(plot.df)
+summary(subset(ISCN3$sample, grepl('^bd_', measurementID) & 
+                          (value <= 0 | value > 2.7)))
+
+nrow(plot.df)
 ```
 
 Number of samples for BD `r length(plot.df$value)`.
@@ -215,7 +220,7 @@ ggplot(merge(subset(ISCN3$sample, grepl('^ph_', measurementID) &
   #scale_x_log10() + 
   facet_wrap(type~unit)
 
-summary(subset(ISCN3$sample, grepl('^ph_', measurementID) & (value <= 1.5 | value > 11))
+summary(subset(ISCN3$sample, grepl('^ph_', measurementID) & (value <= 1.5 | value > 11)))
 #d_ply(subset(ISCN3$sample, grepl('^ph_', measurementID) & (value <= 1.5 | value > 11)), 
 #      'measurementID', function(xx){print(summary(xx))})
 ```
@@ -271,19 +276,20 @@ summary(subset(ISCN3$sample, grepl('(bs|bs_sum)', measurementID) & (value <= 0))
 ```
 
 ## Extractable bases
++ *ca_al* TODO Luke N, what is this??
 + *ca_ext* calcium extractable (SSL: NH4OAc extractable)
 + *k_ext* potassium extractable (SSL: NH4OAc extractable)
 + *mg_ext* magnesium extractable (SSL: NH4OAc extractable)
 + *na_ext* sodium extractable (SSL: NH4OAc extractable)
 + *base_sum* sum of NH4OAc extractable bases
 ```{r metals_ext}
-ggplot(merge(subset(ISCN3$sample, grepl('(ca|k|mg|na)_ext', measurementID) & value > 0),
+ggplot(merge(subset(ISCN3$sample, grepl('(ca|k|mg|na)', measurementID) & value > 0),
              ISCN3$measurement)) +
   geom_histogram(aes(x=value, y=..density..)) + 
   scale_x_log10() + 
   facet_wrap(type~unit, scales='free')
 
-summary(subset(ISCN3$sample, grepl('(ca|k|mg|na)_ext', measurementID) & (value <= 0)))
+summary(subset(ISCN3$sample, grepl('(ca|k|mg|na)', measurementID) & (value <= 0)))
 ```
 
 ## Metal (Al, Fe, Mn) extracts
@@ -334,6 +340,3 @@ ggplot(merge(subset(ISCN3$sample, grepl('^1[345]', measurementID)),
 
 summary(subset(ISCN3$sample, grepl('^1[345]', measurementID)))
 ```
-
-#Locator_parent_alias 
-ties back to old site name in NRCS
