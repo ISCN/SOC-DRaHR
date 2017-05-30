@@ -1,0 +1,10 @@
+This file contains a list of contributors for the soils data recovery project.
+
+The following people identified soil data sets of interest:
+  K Todd-Brown <ktoddbrown@gmail.com>, Pacific Northwest National Lab
+  
+See SoilDataR [https://github.com/ktoddbrown/soilDataR/blob/master/DESCRIPTION] for individuals who contributed code and code review for data ingestion.
+
+The following people write reports for ingested data sets: 
+  K Todd-Brown <ktoddbrown@gmail.com>, Pacific Northwest National Lab
+  
