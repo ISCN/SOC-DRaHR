@@ -41,7 +41,7 @@ Data permissions and reuse are identified in the *Study* Table.
 Data may be excluded from versioning due to data permissions and study authors are encouraged to check permissions before publication.
 
 ## License
-The aggregation scripts here are licensed under XXX.
+The aggregation scripts here are licensed under BSD.
 
 # Table structure
 Currently there are 6 main tables in this data base.
