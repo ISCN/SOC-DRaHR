@@ -40,7 +40,10 @@ mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of
 ggplot(unique(ISCN3$field[, c('lat', 'long')])) +
   mapWorld + 
   geom_hex(aes(x=long, y=lat), bins=200) + 
-  scale_fill_gradient(trans='log10')
+  scale_fill_gradient(trans='log10') +
+  theme_bw() +
+  theme(text=element_text(size=18)) +
+  labs(x='', y='')
 ```
 
 ## Sites with states but no lat-lon
