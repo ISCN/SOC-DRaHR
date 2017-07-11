@@ -44,14 +44,34 @@ Data may be excluded from versioning due to data permissions and study authors a
 The aggregation scripts here are licensed under XXX.
 
 # Table structure
-Currently there are 6 main tables in this data base. 
-1) *Vocabulary* (measurement) table has measurement [measurement_ID, measurement_type, measurement_method]
-2) *Field site* has [field ID, time (collection date), depth.min, depth.max, depth.unit, latitude, longitude, description]
-3) *Field treatment* has [field treatment ID, type, quantiy, units, method]
-4) *Lab* has [lab ID, individualName.givenName, individualName.surName, positionName, electronicMailAddress, onlineUrl, ORCID, organizationName] (labs are made up of organizations and personel)
-5) *Lab treatment* has [lab treatment ID, type, quanity, units, method]
-6) *Sample* has [sample ID, field ID, field treatment ID, lab ID, lab treatment ID, study ID, time, time unit, mesurement type, measurment value, measurement unit]
-7) *Study* has [study ID, DOI, data permissions]
+Currently there are 6 main tables in this data base.
+
+- sample.df — identify laboratory measurement
+	+ id (study, field, field treatment, lab treatment, sample)
+	+ measurement id
+	+ value
+	+ date
+	+ unit
+- measurement.id — identify different measurement types
+	+ id
+	+ type
+	+ method
+- labTreatment.df — identify soil treatments applied in the lab
+	+ incubation conditions
+	+ extraction (fraction method, extraction)
+- field.df — Identify unmanipulated field characteristics 
+	+ spatial (lat, lon, depth)
+	+ temporal (sample date)
+	+ site descriptors (political unit, datum, elevation)
+	+ id
+- fieldTreatment.df — identify treatments applied in the field
+	+ id
+	+ type
+	+ method
+- study.df — identify original and submitting studies
+	+ data provider (curator_name, curator_organization, curator_email, funder)
+	+ data set (name, submission_date, description, permissions, doi)
+	+ original study (name, citation, doi)
 
 
 # References of interest
