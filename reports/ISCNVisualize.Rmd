@@ -17,7 +17,9 @@ Much of the data is from [NRCS](https://www.nrcs.usda.gov/wps/portal/nrcs/site/s
 library(SoilDataR) #library(devtools); install_github("ktoddbrown/soilDataR")
 library(ggplot2) #make pretty plots
 library(plyr) #data management
+library(dplyr)
 library(knitr)
+library(lubridate)
 
 #mapping librarys to help with global/regional plots
 library(ggmap)
@@ -30,6 +32,64 @@ library(fiftystater)
 ISCN3 <- SoilDataR::processData_ISCN3(dir='../repoData/ISCN_3/')
 ```
 
+
+#Observation time
+```{r obsTime}
+location.df <- unique(ISCN3$field[, c('lat', 'long', 'observation_date', 
+                                       'state', 'country')])
+location.df$observation_date <- as.character(location.df$observation_date)
+
+location.df <- ddply(location.df, c('observation_date'), function(xx){
+  temp <- unlist(strsplit(xx$observation_date[1], '/'))
+  xx$month <- NA
+  xx$day <- NA
+  xx$year <- NA
+  if(length(temp) > 1){
+    xx$month <- as.numeric(temp[1])
+    xx$day <- as.numeric(temp[2])
+    xx$year <- ifelse(as.numeric(temp[3]) > 100, as.numeric(temp[3]), 
+                      ifelse(as.numeric(temp[3]) < 20, as.numeric(temp[3]) + 2000,
+                             as.numeric(temp[3]) + 1900))
+    
+  }else{
+    xx$year <- as.numeric(temp[1])
+    if(is.finite(xx$year[1])){
+      xx$month <- 1
+      xx$day <- 1
+    }
+  }
+  
+  return(xx)
+})
+
+location.df$obsDate <- ymd(paste(location.df$year, location.df$month, location.df$day, sep="-"))
+location.df <- location.df[order(location.df$lat, location.df$long, location.df$obsDate),]
+location.df$yrCut <- cut(location.df$year, c(1928, 1940, 1950, 1960, 1970, 1980, 1990, 2000, 2014), dig.lab=4)
+location.df$latCut <- cut(location.df$lat, seq(-90, 90, by=1))
+location.df$longCut <- cut(location.df$long, seq(-180, 180, by=1))
+
+timeSpaceCounts <- location.df %>%
+  group_by(yrCut, latCut, longCut) %>%
+  tally
+```
+```{r plotTime}
+ggplot(location.df, aes(x=obsDate)) + geom_histogram()
+
+mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
+#ggplot() + mapWorld
+ggplot(location.df) +
+  mapWorld + 
+  geom_hex(aes(x=long, y=lat), bins=200) + 
+  scale_fill_gradient(trans='log10') +
+  theme_bw() +
+  theme(text=element_text(size=18)) +
+  labs(x='', y='') +
+  facet_wrap(~yrCut)
+
+ggplot(location.df, aes(x=long, y=lat)) + geom_point(alpha=0.1)
+
+ggplot(timeSpaceCounts, aes(x=n)) + geom_histogram() + scale_x_log10()
+```
 
 # Site locations
 ## Lat-lon map
