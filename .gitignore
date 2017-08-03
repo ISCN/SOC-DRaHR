@@ -40,3 +40,6 @@ cache/
 #tempfiles
 *~
 ~$*
+
+# data files
+repoData/*
