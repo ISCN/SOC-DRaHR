@@ -96,20 +96,18 @@ ggplot(unique(ISCN3$field[, c('lat', 'long')])) +
         axis.title.x = element_blank(), axis.title.y=element_blank())
 ```
 
-## Sites with states but no lat-lon
+## Sites with US states but no lat-lon
 ```{r statemap}
-noLatLon <- unique(subset(ISCN3$field, is.na(lat+long))$fieldID)
-
-stateCounts <- ddply(subset(ISCN3$field, is.na(lat+long)), c('state'), 
-                     summarize, count=length(unique(fieldID)))
-stateCounts$state <- tolower(stateCounts$state)
-
-cat('Following are not considered states:\n')
-kable(subset(stateCounts, ! state %in% fifty_states$id))
-stateCounts <- subset(stateCounts, state %in% fifty_states$id)
+stateCounts <- ISCN3$field %>%
+  filter(is.na(lat+long)) %>%
+  group_by(state, country) %>%
+  tally %>%
+  ungroup() %>%
+  mutate(state=tolower(state),
+         knownState = tolower(state) %in% fifty_states$id)
 
 ggplot(stateCounts, aes(map_id = state)) +
-  geom_map(aes(fill=count), map=fifty_states) +
+  geom_map(aes(fill=n), map=fifty_states) +
   expand_limits(x = fifty_states$long, y = fifty_states$lat) +
   coord_map() +
   scale_x_continuous(breaks = NULL) + 
@@ -122,18 +120,21 @@ ggplot(stateCounts, aes(map_id = state)) +
 
 ## Sites with country but no lat-lon
 ```{r countryMap}
-countryCounts <- ddply(subset(ISCN3$field, is.na(lat+long)), 'country',  summarize, count=length(unique(fieldID)))
-names(countryCounts)[1] <- 'region'
-countryCounts$region <- as.character(countryCounts$region)
-countryCounts$region[grepl('United States', countryCounts$region)] <- 'USA'
-
+countryCounts <- stateCounts %>%
+  group_by(country) %>%
+  summarize(count=sum(n)) %>%
+  mutate(region=if_else(grepl('United States', as.character(country)), 'USA',
+                        as.character(country)))
+  
 map.world <- map_data(map="world")
 
 cat('These countries are unknown to the map\n')
-kable(subset(countryCounts, ! region %in% map.world$region))
-missingCountries <- data.frame(region=setdiff(map.world$region, countryCounts$value), count=NA)
-countryCounts <- rbind(countryCounts, missingCountries)
-#map.world <- merge(map.world, countryCounts, all=TRUE)
+print(setdiff(countryCounts$region, map.world$region))
+
+countryCounts <- countryCounts %>%
+  bind_rows(data.frame(region = setdiff(map.world$region, countryCounts$region),
+                       count = 0))
+
 ggplot(countryCounts, aes(map_id = region)) +
   geom_map(aes(fill=count), map=map.world) +
   expand_limits(x = map.world$long, y = map.world$lat) +
@@ -141,36 +142,41 @@ ggplot(countryCounts, aes(map_id = region)) +
   scale_x_continuous(breaks = NULL) + 
   scale_y_continuous(breaks = NULL) +
   scale_fill_gradient(trans='log10') +
-  labs(x = "", y = "") +
   theme(legend.position = "bottom", 
-        panel.background = element_blank())
+        panel.background = element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank())
 ```
 
-`r nrow(unique(subset(ISCN3$field, (country=='Unknown' | country == '') & is.na(lat+long), select=c('fieldID'))))` sites with no known country nor lat-lon.
+`r sum(filter(countryCounts, (country=='Unknown' | country == ''))$counts)` sites with no known country nor lat-lon.
 
 ## Site count by country map (include sites w/ lat-lon)
 ```{r totCountryCount}
-countryCounts <- ddply(ISCN3$field, 'country', summarize, count=length(unique(fieldID)))
-names(countryCounts)[1] <- 'region'
-countryCounts$region <- as.character(countryCounts$region)
-countryCounts$region[grepl('United States', countryCounts$region)] <- 'USA'
+countryCounts <- ISCN3$field %>%
+  filter(!is.na(lat+long)) %>%
+  group_by(country) %>%
+  tally %>%
+  mutate(region=if_else(grepl('United States', as.character(country)), 'USA',
+                        as.character(country)))
+  
 
 map.world <- map_data(map="world")
 
-missingCountries <- data.frame(region=setdiff(map.world$region, countryCounts$region), count=NA)
-setdiff(countryCounts$region, map.world$region)
-countryCounts <- rbind(countryCounts, missingCountries)
-#map.world <- merge(map.world, countryCounts, all=TRUE)
+countryCounts <- countryCounts %>%
+  bind_rows(data.frame(region = setdiff(map.world$region, countryCounts$region),
+                       n = 0))
+
 ggplot(countryCounts, aes(map_id = region)) +
-  geom_map(aes(fill=count), map=map.world) +
+  geom_map(aes(fill=n), map=map.world) +
   expand_limits(x = map.world$long, y = map.world$lat) +
   coord_cartesian(xlim=c(-180,180), ylim=c(-90,90)) +
   scale_x_continuous(breaks = NULL) + 
   scale_y_continuous(breaks = NULL) +
   scale_fill_gradient(trans='log10') +
-  labs(x = "", y = "") +
   theme(legend.position = "bottom", 
-        panel.background = element_blank())
+        panel.background = element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank())
 ```
 
 # Summary of measurements
