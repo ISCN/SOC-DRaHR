@@ -148,7 +148,7 @@ ggplot(countryCounts, aes(map_id = region)) +
         axis.title.y=element_blank())
 ```
 
-`r sum(filter(countryCounts, (country=='Unknown' | country == ''))$counts)` sites with no known country nor lat-lon.
+`r sum(filter(countryCounts, (country=='Unknown' | country == ''))$count)` sites with no known country nor lat-lon.
 
 ## Site count by country map (include sites w/ lat-lon)
 ```{r totCountryCount}
