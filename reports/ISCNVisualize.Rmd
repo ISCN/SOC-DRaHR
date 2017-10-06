@@ -53,6 +53,9 @@ location.df <- location.df %>%
   
 location.df$obsDate <- ymd(paste(location.df$year, location.df$month, location.df$day, sep="-"))
 location.df <- location.df[order(location.df$lat, location.df$long, location.df$obsDate),]
+
+#year bins picked to cover start/end dates and incrament on decade. 
+#...No distribution reasoning behind this.
 location.df$yrCut <- cut(location.df$year, c(1928, 1940, 1950, 1960, 1970, 1980, 1990, 2000, 2014), dig.lab=4)
 #location.df$yrCut <- location.df$year
 location.df$latCut <- cut(location.df$lat, seq(-90, 90, by=0.05))
