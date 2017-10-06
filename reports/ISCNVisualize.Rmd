@@ -16,7 +16,6 @@ Much of the data is from [NRCS](https://www.nrcs.usda.gov/wps/portal/nrcs/site/s
 ```{r setup}
 library(SoilDataR) #library(devtools); install_github("ktoddbrown/soilDataR")
 library(ggplot2) #make pretty plots
-library(plyr) #data management
 library(dplyr)
 library(knitr)
 library(lubridate)
@@ -41,10 +40,10 @@ location.df <- unique(ISCN3$field[, c('lat', 'long', 'observation_date',
   mutate(observation_date = as.character(observation_date)) %>%
   separate(observation_date, c('monthStr', 'dayStr', 'yearStr'), 
            remove=FALSE, fill='left') %>%
-  mutate(year=case_when(is.na(as.numeric(yearStr)) ~ as.numeric(yearStr),
-                        as.numeric(yearStr) < 20 ~ as.numeric(yearStr) + 2000,
-                        as.numeric(yearStr) < 100 ~ as.numeric(yearStr) + 1900,
-                        TRUE ~ as.numeric(yearStr)),
+  mutate(year=if_else(is.na(as.numeric(yearStr)), as.numeric(yearStr),
+                      if_else(as.numeric(yearStr) < 20, as.numeric(yearStr) + 2000,
+                          if_else(as.numeric(yearStr) < 100, as.numeric(yearStr) + 1900,
+                                  as.numeric(yearStr)))),
          month=if_else(is.na(as.numeric(monthStr)), 1,  as.numeric(monthStr)),
          day=if_else(is.na(as.numeric(dayStr)), 1, as.numeric(dayStr))) %>%
   select(-contains('Str')) %>% 
@@ -53,8 +52,8 @@ location.df <- unique(ISCN3$field[, c('lat', 'long', 'observation_date',
   mutate(yrCut = cut(year, seq(from = floor(min(year, na.rm=TRUE)/10)*10, 
                                to = ceiling(max(year, na.rm=TRUE)/10)*10, by=10),
                      dig.lab=4),
-         latCut = cut(location.df$lat, seq(-90, 90, by=0.05)),
-         longCut = cut(location.df$long, seq(-180, 180, by=0.05)))
+         latCut = cut(lat, seq(-90, 90, by=0.05)),
+         longCut = cut(long, seq(-180, 180, by=0.05)))
 
 timeSpaceCounts <- location.df %>%
   mutate(inUSA = country %in% 'United States') %>%
