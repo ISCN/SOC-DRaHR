@@ -71,8 +71,8 @@ ggplot(location.df) +
   geom_hex(aes(x=long, y=lat), bins=200) + 
   scale_fill_gradient(trans='log10') +
   theme_bw() +
-  theme(text=element_text(size=18)) +
-  labs(x='', y='') +
+  theme(text=element_text(size=18), 
+        axis.title.x = element_blank(), axis.title.y=element_blank()) +
   facet_wrap(~yrCut)
 
 #ggplot(location.df, aes(x=long, y=lat)) + geom_point(alpha=0.1)
@@ -93,8 +93,8 @@ ggplot(unique(ISCN3$field[, c('lat', 'long')])) +
   geom_hex(aes(x=long, y=lat), bins=200) + 
   scale_fill_gradient(trans='log10') +
   theme_bw() +
-  theme(text=element_text(size=18)) +
-  labs(x='', y='')
+  theme(text=element_text(size=18),
+        axis.title.x = element_blank(), axis.title.y=element_blank())
 ```
 
 ## Sites with states but no lat-lon
