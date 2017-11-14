@@ -1,0 +1,245 @@
+---
+title: "Data ingestion for 2017"
+author: "K Todd-Brown (ktoddbrown@gmail.com)"
+date: "11/13/2017"
+output:
+  pdf_document:
+    fig_caption: yes
+    toc: yes
+  html_document: default
+---
+
+```{r setup}
+library(SoilDataR) #library(devtools); install_github("ktoddbrown/soilDataR")
+library(ggplot2) #make pretty plots
+library(dplyr)
+library(knitr)
+library(lubridate)
+library(tidyr)
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+```
+
+Datasets are:
+1) Treat: Peat properties synthesis dataset (2MB, XLSX format, download only; ISCNtemplate_Treat_peatProps_v2): This dataset is a synthesis of literature and site-level data on peat properties, C, N, 14C, and vegetation from 366 sites worldwide. Data are available for nearly 16,000 layers from 659 profiles. Data contributed by Claire Treat.
+2) Alamos soil C stocks (<1MB, XLSX format, download only; ISCNtemplate_Alamos): This site-level dataset comes courtesy of Kris Johnson and collaborators at ITSON (Obregon, MX). It contains 30 profiles sampled by quantitative pit as part of a NASA-supported C monitoring study.
+3) Berhe et al 2012. Fractionation example from the Power Center Working Group, manuscript DOI: 10.1029/2011JG001790
+
+```{r loadData}
+##source('../../SoilDataR/R/processData_Templet.R') ##Uncomment to debug template files
+ingestFiles <- list(
+  filename = c('../repoData/Treat_2015/ISCNtemplate_Treat_peatProps_v2.xlsx',
+               '../repoData/Alamos/ISCNtemplate_Alamos.xlsx',
+               '../repoData/Berhe2012/Berhe_2012.xlsx'),
+  keyFile = c(rep('../templates/ISCNtemplate_2016Key.xlsx', 2),
+              '../templates/PowellCenterKey.xlsx'), 
+  verticalSheets = c(rep('metadata', 2), ''),
+  skip=list(c(1:2), 1:2, NA))
+
+data.ls <- list(study=data.frame(), field=data.frame(), sample=data.frame(), treatment=data.frame())
+for(ii in 1:length(ingestFiles$filename)){
+  temp <- processData_Templet(
+    filename=ingestFiles$filename[[ii]],
+    key.df=readxl::read_excel(path=ingestFiles$keyFile[[ii]], sheet='headerKey'), 
+    skip=ingestFiles$skip[[ii]], 
+    verticalSheets=ingestFiles$verticalSheets[[ii]])
+  
+  ##append data set name
+  datasetName <- unique(temp$study$dataset_name[!is.na(temp$study$dataset_name)])
+  temp$field$dataset_name <- datasetName
+  temp$sample$dataset_name <- datasetName
+  if(nrow(temp$treatment) > 0) temp$treatment$dataset_name <- datasetName
+  
+  ##append units to sample
+  temp$sample <- temp$sample %>%
+    mutate(unit = as.character(unit)) %>%
+    left_join(select(temp$key %>% filter(type == 'value'), var, hardUnit)) %>%
+    mutate(var=as.factor(var))
+  
+  data.ls$study <- bind_rows(data.ls$study,
+                             temp$study)
+  data.ls$field <- bind_rows(data.ls$field,
+                             temp$field)
+  data.ls$sample <- bind_rows(data.ls$sample,
+                              temp$sample)
+  data.ls$treatment <- bind_rows(data.ls$treatment,
+                                 temp$treatment)
+}
+
+##Filter the messy study names
+data.ls$study <- data.ls$study %>% 
+  filter(!is.na(dataset_name) & !is.na(curator_email)) %>%
+  arrange(dataset_name)
+
+data.ls$sample <- data.ls$sample %>%
+  mutate(unit = if_else(is.na(unit), hardUnit, unit))
+```
+
+#Observation time
+```{r obsTime}
+location.df <- data.ls$field %>% 
+  select(lat, long, observation_date, state, country, dataset_name) %>%
+  unique() %>%
+  ###cetch any N|S or E|W notations
+  mutate(lat = if_else(grepl('S', as.character(lat)), -1*as.numeric(gsub('S', '', as.character(lat))),
+                                       as.numeric(gsub('N', '', as.character(lat)))),
+         long = if_else(grepl('W', as.character(long)), -1*as.numeric(gsub('W', '', as.character(long))),
+                                as.numeric(gsub('E', '', as.character(long))))) %>%
+  ###convert the observation dates
+  mutate(observation_date = as.character(observation_date)) %>%
+  separate(observation_date, c('monthStr', 'dayStr', 'yearStr'), 
+           remove=FALSE, fill='left') %>%
+  mutate(year=if_else(is.na(as.numeric(yearStr)), as.numeric(yearStr),
+                      if_else(as.numeric(yearStr) < 20, as.numeric(yearStr) + 2000,
+                              if_else(as.numeric(yearStr) < 100, as.numeric(yearStr) + 1900,
+                                      as.numeric(yearStr)))),
+         month=if_else(is.na(as.numeric(monthStr)), 1,  as.numeric(monthStr)),
+         day=if_else(is.na(as.numeric(dayStr)), 1, as.numeric(dayStr))) %>%
+  select(-contains('Str')) %>% 
+  mutate(obsDate = ymd(paste(year, month, day, sep='-'))) %>%
+  arrange(lat, long, obsDate) %>%
+  ###segment everything
+  mutate(yrCut = cut(year, seq(from = floor(min(year, na.rm=TRUE)/10)*10, 
+                               to = ceiling(max(year, na.rm=TRUE)/10)*10, by=10),
+                     dig.lab=4),
+         latCut = cut(lat, seq(-90, 90, by=0.05)),
+         longCut = cut(long, seq(-180, 180, by=0.05))) %>%
+  ###replace common country names
+  mutate(country = if_else(grepl('USA', country), 'United States', country))
+
+timeSpaceCounts <- location.df %>%
+  group_by(yrCut,  country) %>%
+  tally
+
+print(timeSpaceCounts)
+```
+```{r plotTime}
+ggplot(location.df, aes(x=obsDate, fill=dataset_name)) + geom_histogram()
+
+mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
+#ggplot() + mapWorld
+ggplot(location.df) +
+  mapWorld + 
+  #geom_hex(aes(x=long, y=lat), bins=200) + 
+  geom_point(aes(x=long, y=lat, color=dataset_name)) +
+  scale_fill_gradient(trans='log10') +
+  theme_bw() +
+  theme(text=element_text(size=18),
+        legend.text=element_text(size=10),
+        axis.title=element_blank()) +
+  #ylim(45, 90) + 
+  #coord_map(projection='azequidistant') +
+  facet_wrap(~yrCut)
+
+```
+
+# Site locations
+## Lat-lon map
+```{r mapSites}
+mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
+#ggplot() + mapWorld
+ggplot(unique(location.df[, c('lat', 'long')])) +
+  mapWorld + 
+  geom_hex(aes(x=long, y=lat), bins=200) + 
+  scale_fill_gradient(trans='log10') +
+  theme_bw() +
+  theme(text=element_text(size=18)) +
+  labs(x='', y='')
+```
+
+# Measruements distribution
+```{r measurementHist, fig.height=10, fig.width=7}
+ggplot(data.ls$sample) +
+  geom_histogram(aes(x=value, fill=dataset_name)) +
+  facet_wrap(var~unit, scales='free', ncol=2)
+```
+
+# Comparison with ISCN3
+
+```{r loadISCN3, cache=TRUE}
+#source('../../SoilDataR/R/processData_ISCN3.R')
+ISCN <- processData_ISCN3(layersDir='../repoData/ISCN_3/Layers/', metaDir='../repoData/ISCN_3/Meta/',
+                                      keyFile='../repoData/ISCN_3/ISCNKey.xlsx',
+                          loadVars=as.character(unique(data.ls$sample$var)))
+
+```
+```{r}
+ISCNLocation <- ISCN$field %>% select(ends_with('_name'), lat, lon, state, country, observation_date) %>%
+  rename(long=lon) %>% 
+  select(lat, long, observation_date, state, country, dataset_name) %>%
+  unique() %>%
+  ##Convert to numeric
+  mutate(dataset_name='ISCN3', long=as.numeric(long), lat=as.numeric(lat)) %>%
+  mutate(observation_date = as.character(observation_date)) %>%
+  separate(observation_date, c('monthStr', 'dayStr', 'yearStr'), 
+           remove=FALSE, fill='left') %>%
+  mutate(year=if_else(is.na(as.numeric(yearStr)), as.numeric(yearStr),
+                      if_else(as.numeric(yearStr) < 20, as.numeric(yearStr) + 2000,
+                              if_else(as.numeric(yearStr) < 100, as.numeric(yearStr) + 1900,
+                                      as.numeric(yearStr)))),
+         month=if_else(is.na(as.numeric(monthStr)), 1,  as.numeric(monthStr)),
+         day=if_else(is.na(as.numeric(dayStr)), 1, as.numeric(dayStr))) %>%
+  select(-contains('Str')) %>% 
+  mutate(obsDate = ymd(paste(year, month, day, sep='-')))
+         
+allDatasets <- c(unique(as.character(ISCNLocation$dataset_name)), unique(as.character(location.df$dataset_name)))
+assert_that(length(allDatasets) == length(unique(allDatasets)))
+            
+
+allLocations <- location.df %>%
+  bind_rows(ISCNLocation) %>%
+  mutate(yrCut = cut(year, seq(from = floor(min(year, na.rm=TRUE)/10)*10, 
+                               to = ceiling(max(year, na.rm=TRUE)/10)*10, by=10),
+                     dig.lab=4),
+         latCut = cut(lat, seq(-90, 90, by=0.05)),
+         longCut = cut(long, seq(-180, 180, by=0.05)))
+
+allLocations %>% group_by(dataset_name) %>% 
+  summarize(minYear = min(year, na.rm=TRUE), maxYear=max(year, na.rm=TRUE), x=length(year))
+```
+
+```{r}
+mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
+#ggplot() + mapWorld
+ggplot(allLocations) +
+  mapWorld + 
+  #geom_hex(aes(x=long, y=lat), bins=200) + 
+  geom_hex(data=filter(allLocations, dataset_name == 'ISCN3'), aes(x=long, y=lat), bins=200) +
+  geom_point(data=filter(allLocations, dataset_name != 'ISCN3'), aes(x=long, y=lat, color=dataset_name)) +
+  scale_fill_gradient(trans='log10', low='gold', high='gold4') +
+  theme_bw() +
+  theme(text=element_text(size=18),
+        legend.text=element_text(size=10),
+        axis.title=element_blank(),
+        legend.position='bottom') +
+  #ylim(45, 90) + 
+  #coord_map(projection='azequidistant') +
+  facet_wrap(~yrCut)
+```
+
+```{r}
+refData <- ISCN$measure %>%
+  filter(var %in% c('14c_age', 'n_tot', 'c_tot', 'loi')) %>%
+  left_join(ISCN$sample)
+
+ggplot(data.ls$sample %>% filter(var %in% c('14c_age', 'n_tot', 'c_tot', 'loi'))) +
+  geom_histogram(data=refData, aes(x=value, y=..density..), fill='grey') + 
+  geom_histogram(aes(x=value, y=..density.., fill=dataset_name), alpha=0.5) +
+  facet_wrap(var~unit, scales='free')
+
+refData <- ISCN$measure %>%
+  filter(!var %in% c('14c_age', 'n_tot', 'c_tot', 'loi')) %>%
+  left_join(ISCN$sample)
+
+ggplot(data.ls$sample %>% filter(!var %in% c('14c_age', 'n_tot', 'c_tot', 'loi'))) +
+  geom_histogram(data=refData, aes(x=value, y=..density..), fill='grey') + 
+  geom_histogram(aes(x=value, y=..density.., fill=dataset_name), alpha=0.5) +
+  scale_x_log10() +
+  facet_wrap(var~unit, scales='free')
+
+```
