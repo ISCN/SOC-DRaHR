@@ -161,15 +161,40 @@ ggplot(data.ls$sample) +
 
 # Comparison with ISCN3
 
-```{r loadISCN3, cache=TRUE}
+```{r loadISCN3}
 #source('../../SoilDataR/R/processData_ISCN3.R')
-ISCN <- processData_ISCN3(layersDir='../repoData/ISCN_3/Layers/', metaDir='../repoData/ISCN_3/Meta/',
-                                      keyFile='../repoData/ISCN_3/ISCNKey.xlsx',
-                          loadVars=as.character(unique(data.ls$sample$var)))
+if(file.exists('../temp/ISCN3.RData')){
+  load('../temp/ISCN3.RData')
+  
+  
+}else{
+  ISCN3 <- processData_ISCN3(layersDir='../repoData/ISCN_3/Layers/', metaDir='../repoData/ISCN_3/Meta/',
+                             keyFile='../repoData/ISCN_3/ISCNKey.xlsx',
+                             loadVars=as.character(unique(data.ls$sample$var)))
+}
+```
+
+```{r ISCNclean}
+##Add the hard coded units
+hardUnits.df <- ISCN3$ISCNKey %>% filter(type == 'value', !is.na(hardUnit)) %>% select(var, hardUnit)
+varOfInterest <- as.character(unique(data.ls$sample$var))
+ISCN3$measure <- ISCN3$measure %>% 
+  filter(var %in% varOfInterest) %>% #only pull variables we care about
+  left_join(select(filter(ISCN3$ISCNKey, type=='value'), var, hardUnit), by='var') %>% #add in hard units
+  mutate(unit=if_else(grepl('\\w', unit) , as.character(unit), hardUnit))
+
+measureID_valid <- ISCN3$measure$measureID ##too many df with the same variables
+ISCN3$sample <- ISCN3$sample %>% filter(measureID %in% measureID_valid) #only keep samples with variables of interest
+
+fieldID_valid <- unique(ISCN3$sample$fieldID)
+ISCN3$field <- ISCN3$field %>% 
+  filter(fieldID %in% fieldID_valid) %>% #only keep fields with variables of interests
+  mutate(lat=as.numeric(lat), lon=as.numeric(lon)) #convert lat-lon to numbers
 
 ```
+
 ```{r}
-ISCNLocation <- ISCN$field %>% select(ends_with('_name'), lat, lon, state, country, observation_date) %>%
+ISCNLocation <- ISCN3$field %>% select(ends_with('_name'), lat, lon, state, country, observation_date) %>%
   rename(long=lon) %>% 
   select(lat, long, observation_date, state, country, dataset_name) %>%
   unique() %>%
@@ -223,21 +248,18 @@ ggplot(allLocations) +
 ```
 
 ```{r}
-refData <- ISCN$measure %>%
-  filter(var %in% c('14c_age', 'n_tot', 'c_tot', 'loi')) %>%
-  left_join(ISCN$sample)
+refData <- ISCN3$measure %>%
+  left_join(ISCN3$sample)
 
 ggplot(data.ls$sample %>% filter(var %in% c('14c_age', 'n_tot', 'c_tot', 'loi'))) +
-  geom_histogram(data=refData, aes(x=value, y=..density..), fill='grey') + 
+  geom_histogram(data=refData %>% filter(var %in% c('14c_age', 'n_tot', 'c_tot', 'loi')),
+                 aes(x=value, y=..density..), fill='grey') + 
   geom_histogram(aes(x=value, y=..density.., fill=dataset_name), alpha=0.5) +
   facet_wrap(var~unit, scales='free')
 
-refData <- ISCN$measure %>%
-  filter(!var %in% c('14c_age', 'n_tot', 'c_tot', 'loi')) %>%
-  left_join(ISCN$sample)
-
 ggplot(data.ls$sample %>% filter(!var %in% c('14c_age', 'n_tot', 'c_tot', 'loi'))) +
-  geom_histogram(data=refData, aes(x=value, y=..density..), fill='grey') + 
+  geom_histogram(data=refData %>% filter(!var %in% c('14c_age', 'n_tot', 'c_tot', 'loi')), 
+                 aes(x=value, y=..density..), fill='grey') + 
   geom_histogram(aes(x=value, y=..density.., fill=dataset_name), alpha=0.5) +
   scale_x_log10() +
   facet_wrap(var~unit, scales='free')
