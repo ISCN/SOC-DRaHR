@@ -43,3 +43,6 @@ cache/
 
 # data files
 repoData/*
+
+#temperary folder
+temp/*
