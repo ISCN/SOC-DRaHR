@@ -40,3 +40,9 @@ cache/
 #tempfiles
 *~
 ~$*
+
+# data files
+repoData/*
+
+#temperary folder
+temp/*
