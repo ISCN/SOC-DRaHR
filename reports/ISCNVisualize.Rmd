@@ -1,7 +1,7 @@
 ---
 title: "ISCN3 visualization and report"
 author: "K Todd-Brown (ktoddbrown@gmail.com)"
-date: "5/26/2017"
+date: "11/13/2017"
 output:
   pdf_document:
     fig_caption: yes
@@ -16,8 +16,9 @@ Much of the data is from [NRCS](https://www.nrcs.usda.gov/wps/portal/nrcs/site/s
 ```{r setup}
 library(SoilDataR) #library(devtools); install_github("ktoddbrown/soilDataR")
 library(ggplot2) #make pretty plots
-library(plyr) #data management
-library(knitr)
+library(lubridate)
+library(dplyr)
+library(tidyr)
 
 #mapping librarys to help with global/regional plots
 library(ggmap)
@@ -27,9 +28,80 @@ library(fiftystater)
 ```
 
 ```{r loadData, cache=TRUE}
-ISCN3 <- SoilDataR::processData_ISCN3(dir='../repoData/ISCN_3/')
+
+if(file.exists('../temp/ISCN3.RData')){
+  load('../temp/ISCN3.RData')
+}else{
+  ISCN3 <- processData_ISCN3(layersDir='../repoData/ISCN_3/Layers/',
+                             metaDir='../repoData/ISCN_3/Meta/',
+                             keyFile='../repoData/ISCN_3/ISCNKey.xlsx', verbose=TRUE)
+  save(ISCN3, file='../temp/ISCN3.RData')
+}
+```
+```{r cleanUp}
+#load('../temp/ISCN3.RData')
+##recast the lat-lon as numerics
+ISCN3$field <- ISCN3$field  %>%
+  mutate(lat=as.numeric(lat), lon=as.numeric(lon))
+
+##Add the hard coded units
+hardUnits.df <- ISCN3$ISCNKey %>% filter(type == 'value', !is.na(hardUnit)) %>% select(var, hardUnit)
+ISCN3$measure <-  ISCN3$measure %>% 
+  left_join(select(filter(ISCN3$ISCNKey, type=='value'), var, hardUnit), by='var') %>%
+  mutate(unit=if_else(grepl('\\w', unit) , as.character(unit), hardUnit))
 ```
 
+
+#Observation time
+```{r obsTime}
+location.df <- unique(ISCN3$field[, c('lat', 'lon', 'observation_date', 
+                                      'state', 'country')]) %>%
+  mutate(observation_date = as.character(observation_date),
+         lat = as.numeric(lat), lon=as.numeric(lon)) %>%
+  separate(observation_date, c('monthStr', 'dayStr', 'yearStr'), 
+           remove=FALSE, fill='left') %>%
+  mutate(year=if_else(is.na(as.numeric(yearStr)), as.numeric(yearStr),
+                      if_else(as.numeric(yearStr) < 20, as.numeric(yearStr) + 2000,
+                          if_else(as.numeric(yearStr) < 100, as.numeric(yearStr) + 1900,
+                                  as.numeric(yearStr)))),
+         month=if_else(is.na(as.numeric(monthStr)), 1,  as.numeric(monthStr)),
+         day=if_else(is.na(as.numeric(dayStr)), 1, as.numeric(dayStr))) %>%
+  select(-ends_with('Str')) %>% 
+  mutate(obsDate = ymd(paste(year, month, day, sep='-'))) %>%
+  arrange(lat, lon, obsDate) %>%
+  mutate(yrCut = cut(year, seq(from = floor(min(year, na.rm=TRUE)/10)*10, 
+                               to = ceiling(max(year, na.rm=TRUE)/10)*10, by=10),
+                     dig.lab=4),
+         latCut = cut(lat, seq(-90, 90, by=0.5)),
+         lonCut = cut(lon, seq(-180, 180, by=0.5)))
+
+timeSpaceCounts <- location.df %>%
+  mutate(inUSA = country %in% 'United States') %>%
+  group_by(yrCut, latCut, lonCut, inUSA) %>%
+  tally
+print(location.df %>%
+  group_by(yrCut) %>% tally)
+```
+```{r plotTime}
+ggplot(location.df, aes(x=obsDate)) + geom_histogram()
+
+mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
+#ggplot() + mapWorld
+ggplot(location.df) +
+  mapWorld + 
+  geom_hex(aes(x=lon, y=lat), bins=50) + 
+  scale_fill_gradient(trans='log10') +
+  theme_bw() +
+  theme(text=element_text(size=18), 
+        axis.title.x = element_blank(), axis.title.y=element_blank()) +
+  facet_wrap(~yrCut)
+
+#ggplot(location.df, aes(x=long, y=lat)) + geom_point(alpha=0.1)
+
+ggplot(timeSpaceCounts, aes(x=n)) + geom_histogram() + 
+  scale_x_log10() + scale_y_log10()+ facet_wrap(~inUSA, scales='free') +
+  labs(title='Close space-time sites by USA status')
+```
 
 # Site locations
 ## Lat-lon map
@@ -37,30 +109,29 @@ ISCN3 <- SoilDataR::processData_ISCN3(dir='../repoData/ISCN_3/')
 
 mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
 #ggplot() + mapWorld
-ggplot(unique(ISCN3$field[, c('lat', 'long')])) +
+sites <- location.df %>% select(lat, lon) %>% unique()
+ggplot(sites) +
   mapWorld + 
-  geom_hex(aes(x=long, y=lat), bins=200) + 
+  geom_hex(aes(x=lon, y=lat), bins=50) + 
   scale_fill_gradient(trans='log10') +
   theme_bw() +
-  theme(text=element_text(size=18)) +
-  labs(x='', y='')
+  theme(text=element_text(size=18),
+        axis.title.x = element_blank(), axis.title.y=element_blank())
 ```
 
-## Sites with states but no lat-lon
+## Sites with US states but no lat-lon
 ```{r statemap}
-noLatLon <- unique(subset(ISCN3$field, is.na(lat+long))$fieldID)
-
-stateCounts <- ddply(subset(ISCN3$field, is.na(lat+long)), c('state'), 
-                     summarize, count=length(unique(fieldID)))
-stateCounts$state <- tolower(stateCounts$state)
-
-cat('Following are not considered states:\n')
-kable(subset(stateCounts, ! state %in% fifty_states$id))
-stateCounts <- subset(stateCounts, state %in% fifty_states$id)
+stateCounts <- ISCN3$field %>%
+  filter(is.na(lat+lon)) %>%
+  group_by(state, country) %>%
+  tally %>%
+  ungroup() %>%
+  mutate(state=tolower(state),
+         knownState = tolower(state) %in% fifty_states$id)
 
 ggplot(stateCounts, aes(map_id = state)) +
-  geom_map(aes(fill=count), map=fifty_states) +
-  expand_limits(x = fifty_states$long, y = fifty_states$lat) +
+  geom_map(aes(fill=n), map=fifty_states) +
+  expand_limits(x = fifty_states$lon, y = fifty_states$lat) +
   coord_map() +
   scale_x_continuous(breaks = NULL) + 
   scale_y_continuous(breaks = NULL) +
@@ -72,62 +143,70 @@ ggplot(stateCounts, aes(map_id = state)) +
 
 ## Sites with country but no lat-lon
 ```{r countryMap}
-countryCounts <- ddply(subset(ISCN3$field, is.na(lat+long)), 'country',  summarize, count=length(unique(fieldID)))
-names(countryCounts)[1] <- 'region'
-countryCounts$region <- as.character(countryCounts$region)
-countryCounts$region[grepl('United States', countryCounts$region)] <- 'USA'
-
+countryCounts <- stateCounts %>%
+  group_by(country) %>%
+  summarize(count=sum(n)) %>%
+  mutate(region=if_else(grepl('United States', as.character(country)), 'USA',
+                        as.character(country)))
+  
 map.world <- map_data(map="world")
 
 cat('These countries are unknown to the map\n')
-kable(subset(countryCounts, ! region %in% map.world$region))
-missingCountries <- data.frame(region=setdiff(map.world$region, countryCounts$value), count=NA)
-countryCounts <- rbind(countryCounts, missingCountries)
-#map.world <- merge(map.world, countryCounts, all=TRUE)
+print(setdiff(countryCounts$region, map.world$region))
+
+countryCounts <- countryCounts %>%
+  bind_rows(data.frame(region = setdiff(map.world$region, countryCounts$region),
+                       count = 0))
+
 ggplot(countryCounts, aes(map_id = region)) +
   geom_map(aes(fill=count), map=map.world) +
-  expand_limits(x = map.world$long, y = map.world$lat) +
+  expand_limits(x = map.world$lon, y = map.world$lat) +
   coord_cartesian(xlim=c(-180,180), ylim=c(-90,90)) +
   scale_x_continuous(breaks = NULL) + 
   scale_y_continuous(breaks = NULL) +
   scale_fill_gradient(trans='log10') +
-  labs(x = "", y = "") +
   theme(legend.position = "bottom", 
-        panel.background = element_blank())
+        panel.background = element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank())
 ```
 
-`r nrow(unique(subset(ISCN3$field, (country=='Unknown' | country == '') & is.na(lat+long), select=c('fieldID'))))` sites with no known country nor lat-lon.
+`r sum(filter(countryCounts, (country=='Unknown' | country == ''))$count)` sites with no known country nor lat-lon.
 
 ## Site count by country map (include sites w/ lat-lon)
 ```{r totCountryCount}
-countryCounts <- ddply(ISCN3$field, 'country', summarize, count=length(unique(fieldID)))
-names(countryCounts)[1] <- 'region'
-countryCounts$region <- as.character(countryCounts$region)
-countryCounts$region[grepl('United States', countryCounts$region)] <- 'USA'
+countryCounts <- ISCN3$field %>%
+  filter(!is.na(lat+lon)) %>%
+  group_by(country) %>%
+  tally %>%
+  mutate(region=if_else(grepl('United States', as.character(country)), 'USA',
+                        as.character(country)))
+  
 
 map.world <- map_data(map="world")
 
-missingCountries <- data.frame(region=setdiff(map.world$region, countryCounts$region), count=NA)
-setdiff(countryCounts$region, map.world$region)
-countryCounts <- rbind(countryCounts, missingCountries)
-#map.world <- merge(map.world, countryCounts, all=TRUE)
+countryCounts <- countryCounts %>%
+  bind_rows(data.frame(region = setdiff(map.world$region, countryCounts$region),
+                       n = 0))
+
 ggplot(countryCounts, aes(map_id = region)) +
-  geom_map(aes(fill=count), map=map.world) +
-  expand_limits(x = map.world$long, y = map.world$lat) +
+  geom_map(aes(fill=n), map=map.world) +
+  expand_limits(x = map.world$lon, y = map.world$lat) +
   coord_cartesian(xlim=c(-180,180), ylim=c(-90,90)) +
   scale_x_continuous(breaks = NULL) + 
   scale_y_continuous(breaks = NULL) +
   scale_fill_gradient(trans='log10') +
-  labs(x = "", y = "") +
   theme(legend.position = "bottom", 
-        panel.background = element_blank())
+        panel.background = element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank())
 ```
 
-# Summary of measurements
+# Summary of measures
 
 The following variables are listed in 
 ```{r types}
-table(ISCN3$measurement$type)
+unique(ISCN3$measure$var)
 ```
 All measurements are on oven dry soils and in mass percent where percent noted.
 
@@ -136,13 +215,20 @@ All measurements are on oven dry soils and in mass percent where percent noted.
 + *soc* calculated soil carbon stock of layer/profile
 
 ```{r SOC}
-ggplot(merge(subset(ISCN3$sample, grepl('^soc', measurementID) & value > 0),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  scale_x_log10() + 
-  facet_wrap(type~unit)
+pullVarVis.fun <- function(var.regex='^soc', value.filter=function(xx){xx > 0}){
+  plot.df <- inner_join(ISCN3$sample, 
+                        ISCN3$measure %>% filter(grepl(var.regex, var)))
+  myPlot <- ggplot(plot.df %>% filter(value.filter(value))) +
+    geom_histogram(aes(x=value, y=..density..)) +
+    facet_wrap(var~unit)
+  
+  mySummary <- summary(plot.df %>% filter(!value.filter(value)))
+  return(list(plot=myPlot, neg.summmary=mySummary))
+}
 
-summary(subset(ISCN3$sample, grepl('^soc', measurementID) & (value < 0)))
+printMe <- pullVarVis.fun(var.regex='^soc', value.filter=function(xx){xx > 0})
+print(printMe$plot + scale_x_log10())
+print(printMe$neg.summmary)
 ```
 
 ## Bulk density
@@ -154,20 +240,11 @@ summary(subset(ISCN3$sample, grepl('^soc', measurementID) & (value < 0)))
 
 Reasonable BD minimum 0.03 or lower and maximum 2.7 g cm-3. 
 ```{r BD}
-plot.df <- merge(subset(ISCN3$sample, grepl('^bd_', measurementID) & 
-                          value > 0 & value < 2.7), ISCN3$measurement)
-ggplot(plot.df) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  #scale_x_log10() + 
-  facet_wrap(type~unit)
 
-summary(subset(ISCN3$sample, grepl('^bd_', measurementID) & 
-                          (value <= 0 | value > 2.7)))
-
-nrow(plot.df)
+printMe <- pullVarVis.fun(var.regex='^bd_', value.filter=function(xx){xx > 0 & xx < 2.7})
+print(printMe$plot)
+print(printMe$neg.summmary)
 ```
-
-Number of samples for BD `r length(plot.df$value)`.
 
 ## Carbon (mostly organic)
 
@@ -176,37 +253,27 @@ Number of samples for BD `r length(plot.df$value)`.
 + *loi* loss on ignition uncorrected for C:organics, generally close to half for O-horizon, C about a third of the LOI for lower horizons.
 
 ```{r C_OC_LOI}
-ggplot(merge(subset(ISCN3$sample, grepl('^(c_|oc|loi|soc)', measurementID) & value > 0),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  scale_x_log10() + 
-  facet_wrap(type~unit)
-
-summary(subset(ISCN3$sample, grepl('^(c_|oc|loi)', measurementID) & (value < 0)))
+printMe <- pullVarVis.fun(var.regex='^(c_|oc|loi|soc)', value.filter=function(xx){xx > 0})
+print(printMe$plot + scale_x_log10())
+print(printMe$neg.summmary)
 ```
 
 ## Carbon (inorganic)
 Percent inorganic carbon in a sample.
 
 ```{r CaCO3}
-ggplot(merge(subset(ISCN3$sample, grepl('^caco3', measurementID) & value > 0),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  scale_x_log10() + 
-  facet_wrap(type~unit)
-
-summary(subset(ISCN3$sample, grepl('^caco3', measurementID) & (value <= 0)))
+printMe <- pullVarVis.fun(var.regex='^caco3', value.filter=function(xx){xx > 0})
+print(printMe$plot + scale_x_log10())
+print(printMe$neg.summmary)
 ```
 
 ## Nitrogen
 + *n_tot* most N is organic mass percent dry weight, probably estimated by dry combustion (Dumas methods), sometimes also Kjeldahl digestion converts N to nitrate and then measures nitrate.
 
 ```{r N}
-ggplot(merge(subset(ISCN3$sample, grepl('^n_', measurementID) & value > 0),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  scale_x_log10() + 
-  facet_wrap(type~unit)
+printMe <- pullVarVis.fun(var.regex='^n_', value.filter=function(xx){xx > 0})
+print(printMe$plot + scale_x_log10())
+print(printMe$neg.summmary)
 ```
 
 ## pH
@@ -216,16 +283,9 @@ ggplot(merge(subset(ISCN3$sample, grepl('^n_', measurementID) & value > 0),
 + *ph_other* non-standard catch all
 
 ```{r pH}
-ggplot(merge(subset(ISCN3$sample, grepl('^ph_', measurementID) & 
-                      value > 1.5 & value < 11),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  #scale_x_log10() + 
-  facet_wrap(type~unit)
-
-summary(subset(ISCN3$sample, grepl('^ph_', measurementID) & (value <= 1.5 | value > 11)))
-#d_ply(subset(ISCN3$sample, grepl('^ph_', measurementID) & (value <= 1.5 | value > 11)), 
-#      'measurementID', function(xx){print(summary(xx))})
+printMe <- pullVarVis.fun(var.regex='^ph_', value.filter=function(xx){xx  > 1.5 & xx < 11})
+print(printMe$plot)
+print(printMe$neg.summmary)
 ```
 
 ## Sand, clay, slit, and percent coarse fragement content
@@ -239,15 +299,9 @@ Methods might not be completely annotated.
 + *silt_tot_psa* percentage of silt
 
 ```{r Texture}
-ggplot(merge(subset(ISCN3$sample, grepl('(wpg|tot_psa)', measurementID) & 
-                      value < 100 & value >= 0 ),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  #scale_x_log10() + 
-  facet_wrap(type~unit)
-
-summary(subset(ISCN3$sample, grepl('(wpg|tot_psa)', measurementID) & 
-                 (value < 0 | value > 100)))
+printMe <- pullVarVis.fun(var.regex='(wpg|tot_psa)', value.filter=function(xx){xx  >=0 & xx < 100})
+print(printMe$plot)
+print(printMe$neg.summmary)
 ```
 
 ##Cation exchange capasity and base saturation
@@ -259,23 +313,16 @@ summary(subset(ISCN3$sample, grepl('(wpg|tot_psa)', measurementID) &
 + *bs_sum* base saturation (sum of cations at pH 8.2)
 
 ```{r cat}
-ggplot(merge(subset(ISCN3$sample, grepl('(cat_exch|cec_sum|ecec)', measurementID)& (value > 0)),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  scale_x_log10() + 
-  facet_wrap(type~unit)
+printMe <- pullVarVis.fun(var.regex='(cat_exch|cec_sum|ecec)', value.filter=function(xx){xx > 0})
+print(printMe$plot + scale_x_log10())
+print(printMe$neg.summmary)
 
-summary(subset(ISCN3$sample, grepl('(cat_exch|cec_sum|ecec)', measurementID) & (value <= 0)))
 ```
 
 ```{r bs}
-ggplot(merge(subset(ISCN3$sample, grepl('(bs|bs_sum)', measurementID)& (value > 0)),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  scale_x_log10() + 
-  facet_wrap(type~unit)
-
-summary(subset(ISCN3$sample, grepl('(bs|bs_sum)', measurementID) & (value <= 0)))
+printMe <- pullVarVis.fun(var.regex='(bs|bs_sum)', value.filter=function(xx){xx > 0})
+print(printMe$plot + scale_x_log10())
+print(printMe$neg.summmary)
 ```
 
 ## Extractable bases
@@ -286,13 +333,9 @@ summary(subset(ISCN3$sample, grepl('(bs|bs_sum)', measurementID) & (value <= 0))
 + *na_ext* sodium extractable (SSL: NH4OAc extractable)
 + *base_sum* sum of NH4OAc extractable bases
 ```{r metals_ext}
-ggplot(merge(subset(ISCN3$sample, grepl('(ca|k|mg|na)', measurementID) & value > 0),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  scale_x_log10() + 
-  facet_wrap(type~unit, scales='free')
-
-summary(subset(ISCN3$sample, grepl('(ca|k|mg|na)', measurementID) & (value <= 0)))
+printMe <- pullVarVis.fun(var.regex='^(ca|k|mg|na)', value.filter=function(xx){xx > 0})
+print(printMe$plot + scale_x_log10())
+print(printMe$neg.summmary)
 ```
 
 ## Metal (Al, Fe, Mn) extracts
@@ -304,16 +347,9 @@ For ISCN3 this is only for NRCS data.
 + *mn_other* KCl extractable
 
 ```{r metals_percent}
-ggplot(merge(subset(ISCN3$sample, 
-                    grepl('^(al|fe|mn)_', measurementID) &
-                      (value <= 100 & value >= 0)),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  scale_x_log10() + 
-  facet_wrap(type~unit, scales='free')
-
-summary(subset(ISCN3$sample, grepl('^(al|fe|mn)_', measurementID) &
-                      !grepl('ext', measurementID) & (value < 0 | value > 100)))
+printMe <- pullVarVis.fun(var.regex='^(al|fe|mn)_', value.filter=function(xx){xx >= 0 & xx <= 100})
+print(printMe$plot + scale_x_log10())
+print(printMe$neg.summmary)
 ```
 
 ## Phosphorus
@@ -322,24 +358,16 @@ summary(subset(ISCN3$sample, grepl('^(al|fe|mn)_', measurementID) &
 + *p_other* mehlich3 extractable
 
 ```{r p_percent}
-ggplot(merge(subset(ISCN3$sample, grepl('^p_', measurementID)),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  scale_x_log10() + 
-  facet_wrap(type~unit, scales='free')
-
-summary(subset(ISCN3$sample, grepl('^p_', measurementID) & (value > 100 | value < 0)))
+printMe <- pullVarVis.fun(var.regex='^p_', value.filter=function(xx){xx >= 0 & xx <= 100})
+print(printMe$plot + scale_x_log10())
+print(printMe$neg.summmary)
 ```
 
 ## Isotope
 
 ```{r isotope}
-#15n          13c          14c
-ggplot(merge(subset(ISCN3$sample, grepl('^1[345]', measurementID)),
-             ISCN3$measurement)) +
-  geom_histogram(aes(x=value, y=..density..)) + 
-  #scale_x_log10() + 
-  facet_wrap(~type, scales='free')
 
-summary(subset(ISCN3$sample, grepl('^1[345]', measurementID)))
+printMe <- pullVarVis.fun(var.regex='1[345]', value.filter=function(xx){TRUE})
+print(printMe$plot)
+print(printMe$neg.summmary)
 ```
