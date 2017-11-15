@@ -1,7 +1,7 @@
 ---
 title: "ISCN3 visualization and report"
 author: "K Todd-Brown (ktoddbrown@gmail.com)"
-date: "5/26/2017"
+date: "11/13/2017"
 output:
   pdf_document:
     fig_caption: yes
@@ -28,20 +28,27 @@ library(fiftystater)
 ```
 
 ```{r loadData, cache=TRUE}
-ISCN3 <- SoilDataR::processData_ISCN3(layersDir='../repoData/ISCN_3/Layers/',
-                                      metaDir='../repoData/ISCN_3/Meta/',
-                                      keyFile='../repoData/ISCN_3/ISCNKey.xlsx')
 
+if(file.exists('../temp/ISCN3.RData')){
+  load('../temp/ISCN3.RData')
+}else{
+  ISCN3 <- processData_ISCN3(layersDir='../repoData/ISCN_3/Layers/',
+                             metaDir='../repoData/ISCN_3/Meta/',
+                             keyFile='../repoData/ISCN_3/ISCNKey.xlsx', verbose=TRUE)
+  save(ISCN3, file='../temp/ISCN3.RData')
+}
+```
+```{r cleanUp}
+#load('../temp/ISCN3.RData')
 ##recast the lat-lon as numerics
 ISCN3$field <- ISCN3$field  %>%
   mutate(lat=as.numeric(lat), lon=as.numeric(lon))
 
-##Add the hard coded units TODO debug this 
+##Add the hard coded units
 hardUnits.df <- ISCN3$ISCNKey %>% filter(type == 'value', !is.na(hardUnit)) %>% select(var, hardUnit)
 ISCN3$measure <-  ISCN3$measure %>% 
-  left_join(hardUnits.df) %>% 
-  mutate(unit = if_else(grepl('^\\s*$', unit), as.character(NA), unit)) %>% #remove blanks
-  mutate(unit = if_else(is.na(unit), hardUnit, unit)) #fill in hardcoded units (ie not defined by variables)
+  left_join(select(filter(ISCN3$ISCNKey, type=='value'), var, hardUnit), by='var') %>%
+  mutate(unit=if_else(grepl('\\w', unit) , as.character(unit), hardUnit))
 ```
 
 
@@ -65,13 +72,15 @@ location.df <- unique(ISCN3$field[, c('lat', 'lon', 'observation_date',
   mutate(yrCut = cut(year, seq(from = floor(min(year, na.rm=TRUE)/10)*10, 
                                to = ceiling(max(year, na.rm=TRUE)/10)*10, by=10),
                      dig.lab=4),
-         latCut = cut(lat, seq(-90, 90, by=0.05)),
-         lonCut = cut(lon, seq(-180, 180, by=0.05)))
+         latCut = cut(lat, seq(-90, 90, by=0.5)),
+         lonCut = cut(lon, seq(-180, 180, by=0.5)))
 
 timeSpaceCounts <- location.df %>%
   mutate(inUSA = country %in% 'United States') %>%
   group_by(yrCut, latCut, lonCut, inUSA) %>%
   tally
+print(location.df %>%
+  group_by(yrCut) %>% tally)
 ```
 ```{r plotTime}
 ggplot(location.df, aes(x=obsDate)) + geom_histogram()
@@ -80,7 +89,7 @@ mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of
 #ggplot() + mapWorld
 ggplot(location.df) +
   mapWorld + 
-  geom_hex(aes(x=lon, y=lat), bins=200) + 
+  geom_hex(aes(x=lon, y=lat), bins=50) + 
   scale_fill_gradient(trans='log10') +
   theme_bw() +
   theme(text=element_text(size=18), 
@@ -103,7 +112,7 @@ mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of
 sites <- location.df %>% select(lat, lon) %>% unique()
 ggplot(sites) +
   mapWorld + 
-  geom_hex(aes(x=lon, y=lat), bins=200) + 
+  geom_hex(aes(x=lon, y=lat), bins=50) + 
   scale_fill_gradient(trans='log10') +
   theme_bw() +
   theme(text=element_text(size=18),
@@ -197,7 +206,7 @@ ggplot(countryCounts, aes(map_id = region)) +
 
 The following variables are listed in 
 ```{r types}
-table(ISCN3$measure$var)
+unique(ISCN3$measure$var)
 ```
 All measurements are on oven dry soils and in mass percent where percent noted.
 
