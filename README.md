@@ -23,7 +23,7 @@ Contributers who identify, code and/or review will be acknowledged as co-authors
 Once a data set is found please start an issue including full citation and link to the archived data, this should be updated and used to coordinate data migration from identification to fully processed.
 Processing scripts should be submitted to [SoilDataR](https://github.com/ktoddbrown/soilDataR) via a pull request and filenames should follow the 'processData_\$PI\$year.R' format.
 There is a generalized [key-template script](https://github.com/ktoddbrown/soilDataR/blob/master/R/processData_Templet.R) which we suggest you use when possible.
-Place any dataset keys in the dataset_keys folder of this project; variables should be keyed to ISCN standard names when possible (see the `var` column in [ISCNKey](https://github.com/ktoddbrown/soils-long-tail-recovery/blob/master/dataset_keys/ISCNKey.xlsx)), new variables will be considered as standardized canidates for future ISCN data products.
+Place any dataset keys in the dataset_keys folder of this project; variables should be keyed to ISCN standard names when possible (see the `var` column in [ISCNKey](https://github.com/ktoddbrown/soils-long-tail-recovery/blob/master/dataset_keys/ISCNKey.xlsx)), new variables will be considered as standardized canidates for future ISCN data products. For more details on the expected input file formats and structure of the data key please see the [wiki](https://github.com/ktoddbrown/soils-long-tail-recovery/wiki).
 
 Data contributes are welcome, however the data set must be previously archived elsewhere with an assigned DOI.
 Data providers are encouraged to collaborate with coders to ensure correct data ingestion.
