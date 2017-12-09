@@ -28,7 +28,7 @@ library(fiftystater)
 Datasets are:
 1) Treat: Peat properties synthesis dataset (2MB, XLSX format, download only; ISCNtemplate_Treat_peatProps_v2): This dataset is a synthesis of literature and site-level data on peat properties, C, N, 14C, and vegetation from 366 sites worldwide. Data are available for nearly 16,000 layers from 659 profiles. Data contributed by Claire Treat.
 2) Alamos soil C stocks (<1MB, XLSX format, download only; ISCNtemplate_Alamos): This site-level dataset comes courtesy of Kris Johnson and collaborators at ITSON (Obregon, MX). It contains 30 profiles sampled by quantitative pit as part of a NASA-supported C monitoring study.
-3) Berhe et al 2012. Fractionation example from the Power Center Working Group, manuscript DOI: 10.1029/2011JG001790
+3) Berhe et al 2012. Fractionation example from the Powell Center Working Group, note this dataset is not directly publically available and was coded as an test case for the Powell Center Working Group, manuscript DOI: 10.1029/2011JG001790
 
 ```{r loadData}
 ##source('../../SoilDataR/R/processData_Templet.R') ##Uncomment to debug template files

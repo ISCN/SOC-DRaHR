@@ -19,6 +19,7 @@ library(ggplot2) #make pretty plots
 library(lubridate)
 library(dplyr)
 library(tidyr)
+library(readr)
 
 #mapping librarys to help with global/regional plots
 library(ggmap)
