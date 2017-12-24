@@ -20,6 +20,7 @@ We always need:
     - how to hold a hackathon
 3) Scripts tying into the MPI/Powell Center radiocarbon and fractionation data efforts
 4) Scripts outputing to ISRIC
+5) Transfer identified data sets from 'Issues' to a markdown table
 
 
 ## One year goal (2018)
