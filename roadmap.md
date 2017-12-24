@@ -7,6 +7,21 @@
 
 Versions (with DOI) will be established at major content development milestones that can either include a significant number of datasets harmonized (10+) or refinement of other content.
 
+We always need:
+1) Copy editing for code and documentation
+2) Code review
+
+## Current TODO
+
+1) QA/QC scripts that identify likely duplicate values and flag likely outliers for different variables
+2) Guides for
+    - data contribution
+    - repository use for meta-analysis
+    - how to hold a hackathon
+3) Scripts tying into the MPI/Powell Center radiocarbon and fractionation data efforts
+4) Scripts outputing to ISRIC
+
+
 ## One year goal (2018)
 
 * Establish working protocols for project contributions that follow best practices for open source community
