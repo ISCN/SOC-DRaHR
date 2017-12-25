@@ -40,6 +40,7 @@ We always need:
 * Online lesson for data management, contributions to the project, and utilization of data product for meta analysis
 * Formal ontology based on data ingestion keys to automate common data ingestions
 * Use of harmonization package in 1 scientific product a year by general community
+* Best practice for data rescue from non-machine readable source
 * Funding for project coordinators and community events.
 
 ## Ten year goal (2018-2028)
