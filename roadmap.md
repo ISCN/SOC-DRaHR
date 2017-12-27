@@ -18,9 +18,11 @@ We always need:
     - data contribution
     - repository use for meta-analysis
     - how to hold a hackathon
-3) Scripts tying into the MPI/Powell Center radiocarbon and fractionation data efforts
+3) Scripts input and output from/to the MPI/Powell Center radiocarbon and fractionation data efforts
 4) Scripts outputing to ISRIC
 5) Transfer identified data sets from 'Issues' to a markdown table
+6) Function to fetch files
+7) Add filter to ingest scripts to only load certain variables
 
 
 ## One year goal (2018)
@@ -32,6 +34,7 @@ We always need:
 * First DOI for project repository
   - needs: script to remove duplicates, script to flag bad value ranges, output script, input script
 * Identify interested funders
+* Evaluate possible migration to SQL or other database
 
 ## Five year goal (2018-2023)
 
@@ -41,9 +44,9 @@ We always need:
 * Formal ontology based on data ingestion keys to automate common data ingestions
 * Use of harmonization package in 1 scientific product a year by general community
 * Best practice for data rescue from non-machine readable source
-* Funding for project coordinators and community events.
+* Funding for project coordinators and community events
 
 ## Ten year goal (2018-2028)
 
 * Expand backend to deal with high dimentional data (spectral, 'omics, and high resolution temporal)
-* Funding for project coordinators, community events, and key contributors.
+* Funding for project coordinators, community events, and key contributors
