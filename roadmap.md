@@ -35,6 +35,7 @@ We always need:
   - needs: script to remove duplicates, script to flag bad value ranges, output script, input script
 * Identify interested funders
 * Evaluate possible migration to SQL or other database
+* Transfer ownership of repository to ISCN organizational account
 
 ## Five year goal (2018-2023)
 
