@@ -30,7 +30,7 @@ We always need:
 * Establish working protocols for project contributions that follow best practices for open source community
 * 10 new datasets identified and harmonized by members of the community
 * 2 output format scripts developed that tie into other projects
-* Develope hackathon/workshop material
+* Develop hackathon/workshop material
 * First DOI for project repository
   - needs: script to remove duplicates, script to flag bad value ranges, output script, input script
 * Identify interested funders
