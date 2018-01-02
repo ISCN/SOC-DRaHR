@@ -3,15 +3,14 @@
 Here are some important resources to get you started:
 1) [International Soil Carbon Network](http://iscn.fluxdata.org/) is our parent organization.
 2) [Our code of conduct](CONTRIBUTING.md) is based on the [The Contributor Covenant](https://www.contributor-covenant.org/).
-3) [Our 10K meter roadmap](roadmap.md) of where we want the project to go over the next 1, 5, and 10 years.
+3) [Our roadmap](roadmap.md) of where we want the project to go currently and over the next 1, 5, and 10 years.
 4) [How to contribute](CONTRIBUTING.md)
 
 # Purpose
 
-The purpose of this project is to enable aggregate data sets related to soils research. This includes field surveys, field manipulation studies, and labortory experiments.
-The hope is that this will serve as an open community resource to uncover new mechansims and quantify effects related to soil processes that are globally generalizable.
-
-This project identifies soil carbon datasets that are publically avaiable, provides data harmonization scripts to integrate those data sets, and provides output scripts for a harmonized data product.
+The purpose of this project is to collect haromonization scripts for data sets related to soil carbon to enable scientific research.
+This project identifies soil carbon datasets that are publicly avaiable, provides data harmonization scripts to integrate those data sets, and provides output scripts for a harmonized data product.
+Data can come from field surveys, field manipulation studies, and laboratory experiments.
 
 This project is not a repository or data archive.
 End users are responsible for complying with ALL data use policies of the orginal data providers, please check with the orginal archives and reposities to ensure you are complying with use policies.
