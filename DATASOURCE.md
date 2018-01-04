@@ -21,6 +21,7 @@ flag
 | He 2016 | [He etal Science 2016](http://science.sciencemag.org/content/353/6306/1419.full) | This is a soil radiocarbon meta analysis with 150+ data points from several different studies. | @ktoddbrown | hold for MPI group |
 | Pommier 2017 | [Pommier, Thomas (2017): Measures of microbial, soil and plant variables of three grass-based agro-ecosystems in Austria, the UK and France. PANGAEA, https://doi.org/10.1594/PANGAEA.879537](https://doi.pangaea.de/10.1594/PANGAEA.879537) | Measures of microbial, soil and plant variables of three grass-based agro-ecosystems in Austria, the UK and France (underrepresented regions) | @marzipanwich | |
 | Hume 2017 | [Hume etal J of App Eco, 2017](https://doi.org/10.1111/1365-2664.12942) [data](http://datadryad.org/resource/doi:10.5061/dryad.dd602) | Forest harvest meta-analysis of 808 observations from 49 studies to test the effects of harvesting on the stocks and concentrations of soil C, N, and P and C:N:P ratios relative to uncut control stands | @SJTumber | |
+| Ingrisch 2010 | [Ingrisch, Johannes; Biermann, Tobias; Seeber, Elke; Leipold, Thomas; Li, Maoshan; Ma, Yaoming; Xu, Xingliang; Miehe, Georg; Guggenberger, Georg; Foken, Thomas; Kuzyakov, Yakov (2014): Carbon pools and fluxes measured during a field campaign conducted in 2010 on the Tibetan Plateau at Kema. PANGAEA](https://doi.org/10.1594/PANGAEA.833208) [Isgrisch etal, Sci of Tot Enviro 2014](https://doi.org/10.1016/j.scitotenv.2014.10.082) | Tibetan plateau C stocks study | @marzipanwich| |
 
 # Active data
 
