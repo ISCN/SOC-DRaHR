@@ -28,7 +28,7 @@ We love data and believe that if someone took the time to record something that 
 That being said not every data is appropreate for this project.
 
 For incorporation into this project a dataset needs to have:
- 1) Soil carbon stocks quantified, preferably bulk density and organic carbon percentage
+ 1) Soil carbon stocks \[mass volume-1\] quantified, preferably bulk density \[mass volume-1\] and organic carbon percentage \[mass mass-1\]. Any gap-filling needs to be clearly identified.
  2) A public archive-level DOI or permanent URL guarantee for at least 10 years
  
  Datasets will be prioritized based on:

@@ -1,4 +1,13 @@
-# Long tail recovery project for soils
+# Purpose
+
+The purpose of the Soil Organic Carbon Data Rescue and Harmonization Repository (SOC-DRaHR) is to collect haromonization scripts for data sets related to soil carbon to enable scientific research.
+This project identifies soil carbon datasets that are publicly avaiable, provides data harmonization scripts to integrate those data sets, and provides output scripts for a harmonized data product.
+Data can come from field surveys, field manipulation studies, and laboratory experiments.
+
+This project is not a *data* repository or data.
+End users are responsible for complying with ALL data use policies of the orginal data providers, please check with the orginal archives and reposities to ensure you are complying with use policies.
+
+# Links to get started
 
 Here are some important resources to get you started:
 1) [International Soil Carbon Network](http://iscn.fluxdata.org/) is our parent organization.
@@ -6,17 +15,10 @@ Here are some important resources to get you started:
 3) [Our roadmap](roadmap.md) of where we want the project to go currently and over the next 1, 5, and 10 years.
 4) [How to contribute](CONTRIBUTING.md)
 
-# Purpose
-
-The purpose of this project is to collect haromonization scripts for data sets related to soil carbon to enable scientific research.
-This project identifies soil carbon datasets that are publicly avaiable, provides data harmonization scripts to integrate those data sets, and provides output scripts for a harmonized data product.
-Data can come from field surveys, field manipulation studies, and laboratory experiments.
-
-This project is not a repository or data archive.
-End users are responsible for complying with ALL data use policies of the orginal data providers, please check with the orginal archives and reposities to ensure you are complying with use policies.
-
 # How to contribute
 Please see the [CONTRIBUTING](CONTRIBUTING.md) document for more details on how to contribute, including how to *identify* datasets, contribute to the *code*, and *everything else* that is needed to run an open source community project.
+Contributers will be offered co-authorship for repository DOI but can not be guaranteed co-authorship on manuscripts, proposals or studies that utilize this repository.
+[This repository is licensed here](LICENSE).
 
 # Open data calls
 Below are active data calls for future manuscripts.
