@@ -4,7 +4,7 @@ The purpose of the Soil Organic Carbon Data Rescue and Harmonization Repository 
 This project identifies soil carbon datasets that are publicly avaiable, provides data harmonization scripts to integrate those data sets, and provides output scripts for a harmonized data product.
 Data can come from field surveys, field manipulation studies, and laboratory experiments.
 
-This project is not a *data* repository or data.
+This project is not a _data_ repository or archive but instead a code repository.
 End users are responsible for complying with ALL data use policies of the orginal data providers, please check with the orginal archives and reposities to ensure you are complying with use policies.
 
 # Links to get started
