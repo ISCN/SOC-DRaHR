@@ -3,6 +3,8 @@ This file contains a list of contributors for the soils data recovery project.
 The following people identified soil data sets of interest:
   K Todd-Brown <ktoddbrown@gmail.com>, Pacific Northwest National Lab
   Samuel C Zipper <samuelczipper@gmail.com>, University of Victoria
+  H Lu <luharmony@gmail.com>, Stanford University
+  S Tumber-Davila <stumber@stanford.edu>, Stanford University
   
 See SoilDataR [https://github.com/ktoddbrown/soilDataR/blob/master/DESCRIPTION] for individuals who contributed code and code review for data ingestion.
 
