@@ -36,7 +36,7 @@ For incorporation into this project a dataset needs to have:
   2) Data that are currently of interest to contributors working on meta-analysis
   3) Data reuse policy
   
-  If you are interested in contributing a dataset please for the repository, make a new row entry in the (data sources)[DATASOURCE.md] table, and submit a pull request.
+  If you are interested in contributing a dataset please for the repository, make a new row entry in the [data sources](DATASOURCE.md) table, and submit a pull request.
  
  We currently have trouble with high dimensional data (e.g. high time resolution, FTICR-MS, NMR, genomics, transcriptomics, etc).
  If the dataset is primarily high dimensional but also has bulk data then it may be considered for an incomplete read in.
