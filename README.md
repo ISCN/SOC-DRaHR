@@ -30,12 +30,16 @@ Repository versions will be assigned DOIs as needed.
 Any manuscripts which use these data harmonization scripts are asked to cite the appropreate repository version but are not required to list contributers as co-authors.
 The aggregation scripts here are licensed under BSD 2-clause. See [LICENSE](LICENSE.txt) for details.
 
-# References of interest
+# Outside links of interest
 
-rOpenSci Project: https://ropensci.github.io/
+[Environmental Data Initiative](https://environmentaldatainitiative.org/) has a [GitRepo](https://github.com/EDIorg/ecocomDP) that has a similar approach to aggregating survey data.
 
-R package for interacting with DataOne: https://jsta.github.io/2017/03/28/dataone.html
+[Earth Sciences Information Partners](http://www.esipfed.org/)
 
-Five ways consortia can catalyse open science, Nature, 2017 http://www.nature.com/news/five-ways-consortia-can-catalyse-open-science-1.21706
+[DataOne](https://www.dataone.org/) is a go-to resource for finding environmental data in general and searches many different established repositories. They have an R package for interacting with their search engine [here](https://jsta.github.io/2017/03/28/dataone.html)
 
-National Data Service: http://www.nationaldataservice.org/
+[rOpenSci Project](https://ropensci.github.io/)
+
+Five ways consortia can catalyse open science, [Nature, 2017](http://www.nature.com/news/five-ways-consortia-can-catalyse-open-science-1.21706)
+
+[National Data Service](http://www.nationaldataservice.org/)
