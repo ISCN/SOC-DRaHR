@@ -14,6 +14,7 @@ Here are some important resources to get you started:
 2) [Our code of conduct](CONTRIBUTING.md) is based on the [The Contributor Covenant](https://www.contributor-covenant.org/).
 3) [Our roadmap](roadmap.md) of where we want the project to go currently and over the next 1, 5, and 10 years.
 4) [How to contribute](CONTRIBUTING.md)
+5) [Our mailing list](https://groups.google.com/forum/#!forum/soc-drahr)
 
 # How to contribute
 Please see the [CONTRIBUTING](CONTRIBUTING.md) document for more details on how to contribute, including how to *identify* datasets, contribute to the *code*, and *everything else* that is needed to run an open source community project.
