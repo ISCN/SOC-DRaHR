@@ -28,14 +28,12 @@ library(mapdata)
 library(fiftystater)
 ```
 
-```{r loadData, cache=TRUE}
+```{r loadData}
 
 if(file.exists('../temp/ISCN3.RData')){
   load('../temp/ISCN3.RData')
 }else{
-  ISCN3 <- processData_ISCN3(layersDir='../repoData/ISCN_3/Layers/',
-                             metaDir='../repoData/ISCN_3/Meta/',
-                             keyFile='../repoData/ISCN_3/ISCNKey.xlsx', verbose=TRUE)
+  ISCN3 <- processData_ISCN3(verbose=TRUE)
   save(ISCN3, file='../temp/ISCN3.RData')
 }
 ```
@@ -57,18 +55,21 @@ ISCN3$measure <-  ISCN3$measure %>%
 ```{r obsTime}
 location.df <- unique(ISCN3$field[, c('lat', 'lon', 'observation_date', 
                                       'state', 'country')]) %>%
-  mutate(observation_date = as.character(observation_date),
+  mutate(observation_date = as.numeric(as.character(observation_date)),
          lat = as.numeric(lat), lon=as.numeric(lon)) %>%
-  separate(observation_date, c('monthStr', 'dayStr', 'yearStr'), 
-           remove=FALSE, fill='left') %>%
-  mutate(year=if_else(is.na(as.numeric(yearStr)), as.numeric(yearStr),
-                      if_else(as.numeric(yearStr) < 20, as.numeric(yearStr) + 2000,
-                          if_else(as.numeric(yearStr) < 100, as.numeric(yearStr) + 1900,
-                                  as.numeric(yearStr)))),
-         month=if_else(is.na(as.numeric(monthStr)), 1,  as.numeric(monthStr)),
-         day=if_else(is.na(as.numeric(dayStr)), 1, as.numeric(dayStr))) %>%
-  select(-ends_with('Str')) %>% 
-  mutate(obsDate = ymd(paste(year, month, day, sep='-'))) %>%
+  mutate(observation_date=if_else(observation_date < 1900, as.numeric(NA), observation_date)) %>%
+  #separate(observation_date, c('monthStr', 'dayStr', 'yearStr'), 
+  #         remove=FALSE, fill='left') %>%
+  #mutate(year=if_else(is.na(as.numeric(yearStr)), as.numeric(yearStr),
+  #                    if_else(as.numeric(yearStr) < 20, as.numeric(yearStr) + 2000,
+  #                        if_else(as.numeric(yearStr) < 100, as.numeric(yearStr) + 1900,
+  #                                as.numeric(yearStr)))),
+  #       month=if_else(is.na(as.numeric(monthStr)), 1,  as.numeric(monthStr)),
+  #       day=if_else(is.na(as.numeric(dayStr)), 1, as.numeric(dayStr))) %>%
+  #select(-ends_with('Str')) %>% 
+  #mutate(obsDate = ymd(paste(year, month, day, sep='-'))) %>%
+  mutate(year = floor(observation_date),
+    obsDate = date_decimal(observation_date)) %>%
   arrange(lat, lon, obsDate) %>%
   mutate(yrCut = cut(year, seq(from = floor(min(year, na.rm=TRUE)/10)*10, 
                                to = ceiling(max(year, na.rm=TRUE)/10)*10, by=10),
@@ -241,7 +242,6 @@ print(printMe$neg.summmary)
 
 Reasonable BD minimum 0.03 or lower and maximum 2.7 g cm-3. 
 ```{r BD}
-
 printMe <- pullVarVis.fun(var.regex='^bd_', value.filter=function(xx){xx > 0 & xx < 2.7})
 print(printMe$plot)
 print(printMe$neg.summmary)
@@ -257,6 +257,29 @@ print(printMe$neg.summmary)
 printMe <- pullVarVis.fun(var.regex='^(c_|oc|loi|soc)', value.filter=function(xx){xx > 0})
 print(printMe$plot + scale_x_log10())
 print(printMe$neg.summmary)
+```
+
+### Bulk density vs organic (mostly) carbon
+
+```{r OCvsBD}
+printMe <- inner_join(ISCN3$sample, 
+                        ISCN3$measure %>% filter(grepl('^(c_|oc|loi|bd_)', var)), by='measureID') %>%
+  select(fieldID, var, value) %>%
+  mutate(axis = if_else(grepl('^bd_', .$var), 'x', 'y'),
+         priority = recode(var, bd_sample=1, bd_other=2, bd_tot=4, bd_whole=3,
+                           c_tot=1, oc=2, loi=3)) %>% 
+  group_by(fieldID, axis) %>%
+  summarize(value=value[min(priority)], var=var[min(priority)], priority=min(priority)) %>%
+  filter(is.finite(value))
+
+temp <- printMe %>% filter(fieldID > 445043)
+compare.df <- inner_join(printMe %>% select(fieldID, axis, value) %>% spread(axis, value), 
+                         printMe %>% select(fieldID, axis, var) %>% spread(axis, var), by='fieldID', suffix=c('.value', '.var')) %>%
+  filter(is.finite(x.value+y.value))
+
+ggplot(compare.df) + geom_bin2d(aes(x=x.value, y=y.value)) + facet_grid(x.var~y.var, scales='free')
+
+ggplot(compare.df) + geom_histogram(aes(x=x.value/100*y.value)) + facet_wrap(~x.var+y.var, scales='free') + scale_x_log10()
 ```
 
 ## Carbon (inorganic)
