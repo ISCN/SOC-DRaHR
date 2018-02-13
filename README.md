@@ -7,7 +7,7 @@ Data can come from field surveys, field manipulation studies, and laboratory exp
 This project is not a _data_ repository or archive but instead a code repository.
 End users are responsible for complying with ALL data use policies of the orginal data providers, please check with the orginal archives and reposities to ensure you are complying with use policies.
 
-# Links to get started
+# Project links
 
 Here are some important resources to get you started:
 1) [International Soil Carbon Network](http://iscn.fluxdata.org/) is our parent organization.
@@ -15,6 +15,18 @@ Here are some important resources to get you started:
 3) [Our roadmap](roadmap.md) of where we want the project to go currently and over the next 1, 5, and 10 years.
 4) [How to contribute](CONTRIBUTING.md)
 5) [Our mailing list](https://groups.google.com/forum/#!forum/soc-drahr)
+
+# Quick start
+
+To quickly access ISCN3 data:
+```R
+library(devtools)
+install_github("ISCN/soilDataR")
+library(SoilDataR)
+ISCN3 <- processData_ISCN3()
+```
+
+See [ISCNVisulaize](https://github.com/ktoddbrown/SOC-DRaHR/blob/master/reports/ISCNVisualize.Rmd) for a detailed breakdown of the variables and site locations in ISCN3.
 
 # How to contribute
 Please see the [CONTRIBUTING](CONTRIBUTING.md) document for more details on how to contribute, including how to *identify* datasets, contribute to the *code*, and *everything else* that is needed to run an open source community project.
