@@ -26,8 +26,8 @@ Datasets are:
 2) Alamos soil C stocks (<1MB, XLSX format, download only; ISCNtemplate_Alamos): This site-level dataset comes courtesy of Kris Johnson and collaborators at ITSON (Obregon, MX). It contains 30 profiles sampled by quantitative pit as part of a NASA-supported C monitoring study.
 
 ```{r download}
-#dataDir <- tempdir() #uncomment if you want to download to a temp directory
-dataDir <- '~/Documents/Datasets/temp' #rename if you prefer a different local director
+dataDir <- tempdir() #if you want to download to a temp directory
+#dataDir <- '~/Documents/Datasets/temp' #rename if you prefer a different local director
 
 TreatFilename <- file.path(dataDir, 'ISCNtemplate_Treat_peatProps_v2.xlsx')
 if(!file.exists(TreatFilename)){
