@@ -1,5 +1,5 @@
 ---
-title: "Scratch"
+title: "Stage 2018 data"
 author: "K Todd-Brown (ktoddbrown@gmail.com)"
 date: "3/8/2018"
 output: html_document
@@ -37,6 +37,7 @@ key.df$header[grepl('13C in resp', key.df$header)] <- '13C in resp (permille)'
 ###read the file
 Moore <- readKeyedData(filename=MooreFilename, key.df=key.df)
 
+###add hard keyed values, sigmas, units, methods
 Moore$long <- Moore$key %>% 
   filter(!is.na(softType)) %>%
   filter(!is.na(hardUnit) | !is.na(hardMethod)) %>%
