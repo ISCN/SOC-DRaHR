@@ -1,0 +1,57 @@
+---
+title: "Scratch"
+author: "K Todd-Brown (ktoddbrown@gmail.com)"
+date: "3/8/2018"
+output: html_document
+---
+
+```{r setup}
+library(SoilDataR) #library(devtools); install_github("ISCN/soilDataR")
+library(tidyverse)
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+```
+
+```{r Moore2015}
+downloadURL <- 'https://datadryad.org/bitstream/handle/10255/dryad.97546/Moore%202015%20Final%20Data.csv?sequence=1'
+#dataDir <- tempdir() #if you want to download to a temp directory
+dataDir <- '~/Documents/Datasets/temp' #rename if you prefer a different local director
+
+MooreFilename <- file.path(dataDir, 'Moore 2015 Final Data.csv')
+if(!file.exists(MooreFilename)){
+  download.file(downloadURL,  MooreFilename, quiet=FALSE)
+}
+
+##the permille ascii doesn't play nice so remove it from the header and key
+temp <- read_csv(MooreFilename, col_names =TRUE)
+names(temp)[7] <- "13C in resp (permille)"
+write_csv(temp, path=MooreFilename)
+
+key.df <- read_csv('../dataset_keys/Moore2015.csv')
+key.df$header[grepl('13C in resp', key.df$header)] <- '13C in resp (permille)'
+
+###read the file
+Moore <- readKeyedData(filename=MooreFilename, key.df=key.df)
+
+Moore$long <- Moore$key %>% 
+  filter(!is.na(softType)) %>%
+  filter(!is.na(hardUnit) | !is.na(hardMethod)) %>%
+  rename(unit=hardUnit, method=hardMethod) %>%
+  select(var, unit, method) %>%
+  full_join(Moore$long)
+
+Moore$wide <- Moore$key %>% 
+  filter(is.na(softType)) %>%
+  filter(!is.na(hardUnit) | !is.na(hardMethod) | !is.na(hardValue) | !is.na(hardSigma)) %>%
+  select(var, contains('hard')) %>%
+  gather(key='type', value='text', contains('hard'), na.rm=TRUE) %>%
+  mutate(type = gsub('hard', '', type)) %>%
+  mutate(header = paste(var, if_else(type == 'Value', '', paste('_', type, sep='')), sep='')) %>%
+  select(header, text) %>%
+  spread(key=header, value=text) %>%
+  data.frame(Moore$wide)
+```

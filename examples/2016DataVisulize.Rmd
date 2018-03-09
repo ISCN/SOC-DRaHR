@@ -1,0 +1,187 @@
+---
+title: "Data ingestion for 2017"
+author: "K Todd-Brown (ktoddbrown@gmail.com)"
+date: "8 March 2018"
+output:
+  html_document: default
+  pdf_document:
+    fig_caption: yes
+    toc: yes
+---
+
+```{r setup}
+library(SoilDataR) #library(devtools); install_github("ISCN/soilDataR")
+library(tidyverse)
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+```
+
+Datasets are:
+1) Treat: Peat properties synthesis dataset (2MB, XLSX format, download only; ISCNtemplate_Treat_peatProps_v2): This dataset is a synthesis of literature and site-level data on peat properties, C, N, 14C, and vegetation from 366 sites worldwide. Data are available for nearly 16,000 layers from 659 profiles. Data contributed by Claire Treat.
+2) Alamos soil C stocks (<1MB, XLSX format, download only; ISCNtemplate_Alamos): This site-level dataset comes courtesy of Kris Johnson and collaborators at ITSON (Obregon, MX). It contains 30 profiles sampled by quantitative pit as part of a NASA-supported C monitoring study.
+
+```{r download}
+dataDir <- tempdir() #if you want to download to a temp directory
+#dataDir <- '~/Documents/Datasets/temp' #rename if you prefer a different local director
+
+TreatFilename <- file.path(dataDir, 'ISCNtemplate_Treat_peatProps_v2.xlsx')
+if(!file.exists(TreatFilename)){
+  download.file(
+    'http://iscn.fluxdata.org/wp-content/uploads/sites/15/ISCNtemplate_Treat_peatProps_v2.xlsx', 
+    TreatFilename, quiet=FALSE)
+}
+
+AlamosFilename <- file.path(dataDir,'ISCNtemplate_Alamos.xlsx')
+if(!file.exists(AlamosFilename)){
+  download.file(
+    'http://iscn.fluxdata.org/wp-content/uploads/sites/15/ISCNtemplate_Alamos.xlsx', 
+    AlamosFilename, quiet=FALSE)
+}
+##Alamose has some formatting issues so let's deal with that first
+AlamosDownload <- AlamosFilename
+AlamosFilename <- file.path(dataDir, c('ISCNtemplate_Alamos_metadata.csv',
+                                       'ISCNtemplate_Alamos_site.csv',
+                                       'ISCNtemplate_Alamos_profile.csv',
+                                       'ISCNtemplate_Alamos_layer.csv'))
+temp <-  readxl::read_excel(AlamosDownload, sheet='metadata')
+readr::write_csv(path=AlamosFilename[1],
+                 x=temp) #metadata sheet is fine
+readr::write_csv(path=AlamosFilename[2],
+                 x= readxl::read_excel(AlamosDownload, sheet='site')[-3,]) #remove empty row
+readr::write_csv(path=AlamosFilename[3],
+                 readxl::read_excel(AlamosDownload, sheet='profile')[-3,]) #remove empty row
+readr::write_csv(path=AlamosFilename[4],
+                 #remove empty row
+                 readxl::read_excel(AlamosDownload, sheet='layer')[-3,] %>% 
+                   #and fill in rows with non-NA values above
+                   tidyr::fill(site_name) %>%
+                   #make the layer name unique
+                   mutate(layer_name = paste(profile_name, layer_name, sep='-')))
+
+```
+
+```{r readKey}
+key.df <- read_csv('../dataset_keys/ISCNtemplate_2016Key.csv')
+```
+
+```{r loadData}
+
+Treat <- SoilDataR::readKeyedData(filename=TreatFilename, key.df=key.df, dropRows=1:2)
+Treat$long <- Treat$key %>% 
+  filter(!is.na(hardUnit)) %>% #units are the only thing hard coded here
+  select(var, hardUnit) %>% unique %>% 
+  right_join(Treat$long, by=c('var')) %>% 
+  rename(unit=hardUnit)
+
+Alamos <- SoilDataR::readKeyedData(filename=AlamosFilename, 
+                                   verticalTable = c(AlamosFilename[1]),
+                                   key.df=key.df, dropRows=1:2)
+
+Alamos$long <- Alamos$key %>% 
+  filter(!is.na(hardUnit)) %>% #units are the only thing hard coded here
+  select(var, hardUnit) %>% unique %>% 
+  right_join(Alamos$long, by=c('var')) %>% 
+  rename(unit=hardUnit)
+```
+
+```{r constructTables}
+data.ls <- list()
+data.ls$study <- Alamos$wide %>% bind_rows(Treat$wide) %>% #merge two datasets
+  select_(.dots=intersect(names(.), c((Alamos$key %>% filter(dataframe == 'study'))$var,
+           (Treat$key %>% filter(dataframe == 'study'))$var))) %>% #select vars
+  unique %>%
+  group_by_(.dots=unique(c((Alamos$key %>% 
+                              filter(dataframe == 'study', !is.na(flagID)))$var,
+           (Treat$key %>% 
+              filter(dataframe == 'study', !is.na(flagID)))$var))) #group by key
+
+data.ls$field <- Alamos$wide %>% bind_rows(Treat$wide) %>% #merge two datasets
+  select_(.dots=intersect(names(.), 
+                          c((Alamos$key %>% filter(dataframe == 'field' |
+                                                     !is.na(flagID)))$var,
+                            (Treat$key %>% filter(dataframe == 'field'|
+                                                    !is.na(flagID)))$var))) %>% #select vars
+  unique %>%
+  mutate_at(vars('layer_top', 'layer_bottom', 'lon', 'lat'), funs(as.numeric)) %>%
+  mutate(observation_date = 
+              if_else(grepl('/', observation_date),
+                      lubridate::decimal_date( lubridate::mdy(observation_date)),
+                      as.numeric(observation_date))) %>%
+  mutate_at(vars(-lon, -lat, -layer_top, -layer_bottom, -observation_date),
+            funs(factor)) %>%
+              group_by(dataset_name, layer_name, profile_name, site_name) #group by names
+  
+data.ls$sample <- Alamos$long %>% 
+  mutate(dataset_name=unique(Alamos$wide$dataset_name)) %>%
+  bind_rows(Treat$long %>% 
+               mutate(dataset_name=unique(Treat$wide$dataset_name))) %>%
+  ungroup() %>%
+  mutate_at(vars(-value, -sigma),funs(factor)) %>%
+  mutate_at(vars('value', 'sigma'), funs(as.numeric)) %>%
+  group_by_(.dots=groups(data.ls$field))
+```
+
+#Observation time
+```{r obsTime}
+location.df <- data.ls$field %>% ungroup %>% 
+  select(lat, lon, observation_date, state, country, dataset_name) %>%
+  ###segment everything
+  mutate(yrCut = cut(observation_date,
+                     seq(from = 1960, 
+                         to = 2020, by=20),
+                     dig.lab=4),
+         latCut = cut(lat, seq(-90, 90, by=0.05)),
+         lonCut = cut(lon, seq(-180, 180, by=0.05)))
+
+timeSpaceCounts <- location.df %>%
+  group_by(yrCut,  country) %>%
+  tally %>%
+  spread(key=yrCut, value=n)
+
+print(timeSpaceCounts)
+```
+```{r plotTime}
+ggplot(location.df, aes(x=observation_date, fill=dataset_name)) + geom_histogram()
+
+mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
+#ggplot() + mapWorld
+ggplot(location.df) +
+  mapWorld + 
+  #geom_hex(aes(x=long, y=lat), bins=200) + 
+  geom_point(aes(x=lon, y=lat, color=dataset_name)) +
+  scale_fill_gradient(trans='log10') +
+  theme_bw() +
+  theme(text=element_text(size=18),
+        legend.text=element_text(size=10),
+        axis.title=element_blank()) +
+  #ylim(45, 90) + 
+  #coord_map(projection='azequidistant') +
+  facet_wrap(~yrCut)
+
+```
+
+# Site locations
+## Lat-lon map
+```{r mapSites}
+mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
+#ggplot() + mapWorld
+ggplot(unique(location.df[, c('lat', 'lon')])) +
+  mapWorld + 
+  geom_hex(aes(x=lon, y=lat), bins=200) + 
+  scale_fill_gradient(trans='log10') +
+  theme_bw() +
+  theme(text=element_text(size=18)) +
+  labs(x='', y='')
+```
+
+# Measruements distribution
+```{r measurementHist, fig.height=10, fig.width=7}
+ggplot(data.ls$sample) +
+  geom_histogram(aes(x=value, fill=dataset_name)) +
+  facet_wrap(var~unit, scales='free', ncol=2)
+```
