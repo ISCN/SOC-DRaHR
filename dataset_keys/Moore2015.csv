@@ -1,0 +1,44 @@
+﻿header,var,varLong,flagID,dataframe,class,softType,hardUnit,hardValue,hardSigma,hardMethod
+Core ID,core_name,,field_id,field,factor,,,,,
+exclusion group,root_exclusion,,,field,factor,,,,,"We constructed 30 soil mesocosms using PVC pipe (15 cm long, 5 cm diameter) (Phillips et al. 2012). In each of the PVC mesocosms, we cut two 10.5 9 8 cm rectangular openings into the sides and cov- ered these openings and the circular bottom of the PVC mesocosm with 1.45 mm, 55 or 5 lm stainless steel mesh to allow root and mycorrhizal access, exclude roots or exclude roots and mycorrhizas, respectively"
+,core_diameter,,,field,numeric,,cm,5,,
+,core_depth,,,field,numeric,,cm,15,,
+carbon label,carbon_label,,,field,factor,,,,,"On 9 September 2013, we mixed 5 mg of 99 atom-% 13C-labelled starch (Cambridge Isotope Laboratories, Tewksbury, MA, USA) into 30 mL of deionized water and injected the mixture evenly into the mesocosm soil profile. "
+,start_date,,,field,date,,,15-May-13,,
+removal date,end_date,,,field,date,,,,,
+soil respiration (umol CO2 m-2 s-1),,,,sample,,value,umol CO2 m-2 s-1,,,
+soil respiration (mg C g-1 h-1),soil_resipration,,,sample,,value,mg C g-1 h-1,,,
+13C in resp (‰),soil_respiration_13C,,,sample,,value,permille,,,"To collect gas samples for 13C analysis, we capped each mesocosm with a 5-cm PVC cap equipped with a rubber septum. After 20 min, we extracted four 15-mL gas samples over a period of 10 min from each mesocosm using a syringe and needle. We also collected four site-level samples of ambient air to measure the ambient 13C in the background atmospheric CO2. The four 13CO2 samples collected from each core and the average 13CO2 background measurement were used to con- struct a Keeling plot. The Keeling plot enabled us to calculate the @13C of the source of the carbon substrates metabolized by the soil microbial community (Pataki, Bowling & Ehleringer 2003). "
+fine roots (mg per core),fine_roots,,,sample,,value,mg per core,,,
+hyphal biomass (mg g-1),hyphal_biomass,,,sample,,value,mg g-1,,,
+DOC (g C/kg soil),disolved_organic_carbon,,,sample,,value,g C kg-1 soil,,,
+MBC (mg C g-1 dry soil),microbial_biomass,,,sample,,value,mg C g-1 dry soil,,,cloroform fumigation extraction
+POM mass (g),,,,sample,,value,g,,,"We weighed 10 g of air-dried and sieved soil in a 10-mL specimen cup with ten 4-mm glass beads and 40 mL of water and then agitated the slurry on a reciprocal shaker (Eberbach Co.) for 18 h. After agitation, we poured the soil slurry through a 53-lm screen and rinsed the sample with deionized water to remove all traces of MOM from POM. Solids > 53 lm were clas- sified as POM and those smaller than 53 lm were classified as MOM "
+POM percent,,,,sample,,value,percent,,,"We weighed 10 g of air-dried and sieved soil in a 10-mL specimen cup with ten 4-mm glass beads and 40 mL of water and then agitated the slurry on a reciprocal shaker (Eberbach Co.) for 18 h. After agitation, we poured the soil slurry through a 53-lm screen and rinsed the sample with deionized water to remove all traces of MOM from POM. Solids > 53 lm were clas- sified as POM and those smaller than 53 lm were classified as MOM "
+POC (ug C/mg dry soil),light_fraction,,,sample,,value,ug C mg-1 dry soil,,,"We weighed 10 g of air-dried and sieved soil in a 10-mL specimen cup with ten 4-mm glass beads and 40 mL of water and then agitated the slurry on a reciprocal shaker (Eberbach Co.) for 18 h. After agitation, we poured the soil slurry through a 53-lm screen and rinsed the sample with deionized water to remove all traces of MOM from POM. Solids > 53 lm were clas- sified as POM and those smaller than 53 lm were classified as MOM "
+MOM mass (g),,,,sample,,value,g,,,"We weighed 10 g of air-dried and sieved soil in a 10-mL specimen cup with ten 4-mm glass beads and 40 mL of water and then agitated the slurry on a reciprocal shaker (Eberbach Co.) for 18 h. After agitation, we poured the soil slurry through a 53-lm screen and rinsed the sample with deionized water to remove all traces of MOM from POM. Solids > 53 lm were clas- sified as POM and those smaller than 53 lm were classified as MOM "
+MOM percent,,,,sample,,value,percent,,,"We weighed 10 g of air-dried and sieved soil in a 10-mL specimen cup with ten 4-mm glass beads and 40 mL of water and then agitated the slurry on a reciprocal shaker (Eberbach Co.) for 18 h. After agitation, we poured the soil slurry through a 53-lm screen and rinsed the sample with deionized water to remove all traces of MOM from POM. Solids > 53 lm were clas- sified as POM and those smaller than 53 lm were classified as MOM "
+MOC (ug C/mg dry soil),heavy_fraction,,,sample,,value,ug C mg-1 dry soil,,,"We weighed 10 g of air-dried and sieved soil in a 10-mL specimen cup with ten 4-mm glass beads and 40 mL of water and then agitated the slurry on a reciprocal shaker (Eberbach Co.) for 18 h. After agitation, we poured the soil slurry through a 53-lm screen and rinsed the sample with deionized water to remove all traces of MOM from POM. Solids > 53 lm were clas- sified as POM and those smaller than 53 lm were classified as MOM "
+cbh activity (nmol g-1 h-1),enzyme_cellobiohydrolase,cellobiohydrolase,,sample,,value,nmol g-1 h-1,,,
+peroxidase (nmol g-1 h-1),enzyme_peroxidase,peroxidase,,sample,,value,nmol g-1 h-1,,,
+b gluc activity (nmol g-1 h-1),enzyme_b_glucosidase,Beta-glucosidase,,sample,,value,nmol g-1 h-1,,,
+phen ox (nmol g-1 h-1),enzyme_phenol_oxydase,phenol_oxydase,,sample,,value,nmol g-1 h-1,,,
+GWC (%),gravimetric_water_content,,,sample,,value,percent,,,
+,dataset_name,,study_id,study,,,,Moore2015,,
+,dataset_description,,,study,,,,"Soil respiration, soil carbon pools, and enzyme activities. The first row is a header and units of measurement are included in this row. In ""exclusion group"", R=roots and M= mycorrhizae. In ""carbon label"", C=control (water-only) and L=labeled starch addition.",,
+,reference,,,study,,,,https://doi.org/10.1111/1365-2745.12484,,
+,citation_manuscript,,,study,,,,"Moore JAM, Jiang J, Patterson CM, Mayes MA, Wang G, Classen AT (2015) Interactions among roots, mycorrhizae and free-living microbial communities differentially impact soil carbon processes. Journal of Ecology 103(6): 1442-1453. https://doi.org/10.1111/1365-2745.12484",,
+,citation,,,study,,,,"Moore JAM, Jiang J, Patterson CM, Wang G, Mayes MA, Classen AT (2015) Data from: Interactions among roots, mycorrhizae and free-living microbial communities differentially impact soil carbon processes. Dryad Digital Repository. https://doi.org/10.5061/dryad.pb271",,
+,citation_usage,,,study,,,,Please cite both the manuscript and Dryad data package,,
+,license,,,study,,,,CC-0 https://creativecommons.org/publicdomain/zero/1.0/,,
+,download_url,,,study,,,,https://datadryad.org/bitstream/handle/10255/dryad.97546/Moore%202015%20Final%20Data.csv?sequence=1,,
+,lat,,,field,,,,35.957889,,
+,lon,,,field,,,,-84.286692,,
+,mat,,,field,,,deg C,14.5,,
+,map,,,field,,,mm yr-1,1400,,
+,bulk_sample,,,field,,,g cm-3,1.4,0.5,"From 
+doi:10.2136/vzj2005.0036 - Bulk samples were air dried and passively ground to pass a 2-mm sieve "
+,ph_other,,,field,,,,4.5,0.5,"from 
+doi:10.2136/vzj2005.0036 "
+,soil_taxon,,,field,,,,ultisols Fullerton-Palio complex,,USDA Natural Resources Conservation Service Soils 
+,hzn,,,field,,,,B,,
