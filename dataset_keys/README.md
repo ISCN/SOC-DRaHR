@@ -11,6 +11,8 @@ Description of files:
     - Decrepid and should not be used for anything other then historical reference.
 + Moore2015.csv
     - template key for Moore JAM, Jiang J, Patterson CM, Wang G, Mayes MA, Classen AT (2015) Data from: Interactions among roots, mycorrhizae and free-living microbial communities differentially impact soil carbon processes. Dryad Digital Repository. https://doi.org/10.5061/dryad.pb271
++ Shaw2018.csv
+    - template key for Shaw, C., Hilger, A., Filiatrault, M. and Kurz, W. (in press), A Canadian upland forest soil profile and carbon stocks database. Ecology. Accepted Author Manuscript. doi:10.1002/ecy.2159
 
 
 Below is a discription of the headers expected in the key. 
