@@ -19,7 +19,7 @@ library(fiftystater)
 dataDir <- '~/Documents/Datasets/temp' #rename if you prefer a different local director
 ```
 
-```{r Moore2015}
+```{r Moore2015, eval=FALSE, echo=FALSE}
 downloadURL <- 'https://datadryad.org/bitstream/handle/10255/dryad.97546/Moore%202015%20Final%20Data.csv?sequence=1'
 
 
@@ -68,6 +68,7 @@ Copyright restrictions
 
 Information contained in this publication or product may be reproduced, in part or in whole, and by any means, for personal or public non-commercial purposes, without charge or further permission, unless otherwise specified.
 You are asked to:
+
 -  exercise due diligence in ensuring the accuracy of the materials reproduced;
 -  indicate the complete title of the materials reproduced, and the name of the author organization; and
 -  indicate that the reproduction is a copy of an official work that is published by Natural Resources Canada (NRCan) and that the reproduction has not been produced in affiliation with, or with the endorsement of, NRCan.
