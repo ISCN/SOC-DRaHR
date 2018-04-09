@@ -14,12 +14,20 @@ library(ggmap)
 library(maps)
 library(mapdata)
 library(fiftystater)
-```
 
-```{r Moore2015}
-downloadURL <- 'https://datadryad.org/bitstream/handle/10255/dryad.97546/Moore%202015%20Final%20Data.csv?sequence=1'
 #dataDir <- tempdir() #if you want to download to a temp directory
 dataDir <- '~/Documents/Datasets/temp' #rename if you prefer a different local director
+```
+
+# Moore et al 2015
+ 
+ Manuscript citation: Moore JAM, Jiang J, Patterson CM, Mayes MA, Wang G, Classen AT (2015) Interactions among roots, mycorrhizae and free-living microbial communities differentially impact soil carbon processes. Journal of Ecology 103(6): 1442-1453. https://doi.org/10.1111/1365-2745.12484
+ 
+ Data link: https://doi.org/10.5061/dryad.pb271
+ 
+```{r Moore2015}
+downloadURL <- 'https://datadryad.org/bitstream/handle/10255/dryad.97546/Moore%202015%20Final%20Data.csv?sequence=1'
+
 
 MooreFilename <- file.path(dataDir, 'Moore 2015 Final Data.csv')
 if(!file.exists(MooreFilename)){
@@ -55,4 +63,79 @@ Moore$wide <- Moore$key %>%
   select(header, text) %>%
   spread(key=header, value=text) %>%
   data.frame(Moore$wide)
+```
+
+#Shaw et al (in press)
+Extremely well documented.
+
+Shaw, C., Hilger, A., Filiatrault, M. and Kurz, W. (in press), A Canadian upland forest soil profile and carbon stocks database. Ecology. Accepted Author Manuscript. doi:10.1002/ecy.2159
+
+Copyright restrictions
+© Her Majesty the Queen in Right of Canada, 2017
+
+Information contained in this publication or product may be reproduced, in part or in whole, and by any means, for personal or public non-commercial purposes, without charge or further permission, unless otherwise specified.
+You are asked to:
+
+-  exercise due diligence in ensuring the accuracy of the materials reproduced;
+-  indicate the complete title of the materials reproduced, and the name of the author organization; and
+-  indicate that the reproduction is a copy of an official work that is published by Natural Resources Canada (NRCan) and that the reproduction has not been produced in affiliation with, or with the endorsement of, NRCan.
+-  Commercial reproduction and distribution is prohibited except with written permission from NRCan. For more information, contact NRCan at copyright.droitdauteur@nrcan-rncan.gc.ca.
+
+```{r Shaw2018}
+ShawDownload_url <- c('http://binarystore.wiley.com/store/10.1002/ecy.2159/asset/supinfo/ecy2159-sup-0002-MetadataS1.pdf?v=1&s=1b267bc2e7bbafc52b12a9e522033fa590445713', 
+   'http://binarystore.wiley.com/store/10.1002/ecy.2159/asset/supinfo/ecy2159-sup-0001-DataS1.zip?v=1&s=f95f40084248b880723282404305327c0aa95aeb')
+
+
+ShawDownloadFilename <- file.path(dataDir, 
+                                  c('ecy2159-sup-0002-MetadataS1.pdf',
+                                    'ecy2159-sup-0001-DataS1.zip'))
+if(!all(file.exists(ShawDownloadFilename))){
+  download.file(ShawDownload_url[1], ShawDownloadFilename[1], quiet=FALSE)
+  download.file(ShawDownload_url[2], ShawDownloadFilename[2], quiet=FALSE)
+}
+ShawDataFiles <- file.path(file.path(dataDir, 'Shaw2018'),
+                           unzip(ShawDownloadFilename[2], list=TRUE))
+
+unzip(ShawDownloadFilename[2], exdir=file.path(dataDir, 'Shaw2018'))
+
+key.df <- read_csv('../dataset_keys/Shaw2018.csv')
+Shaw <- SoilDataR::readKeyedData(
+  filename=file.path(dataDir, 'Shaw2018',
+                     c('REFERENCES.csv', 'SITES.csv', 'PROFILES.csv')), key.df=key.df)
+
+Shaw$long <- Shaw$key %>% ungroup() %>%
+  filter(!is.na(softType)) %>%
+  filter(!is.na(hardUnit) | !is.na(hardMethod)) %>%
+  select(var, hardUnit, hardMethod) %>% ##only units and methods are hard in Shaw2018
+  full_join(Shaw$long, by='var') %>% ungroup() %>%
+  mutate(method=ifelse(is.na(hardMethod), method, hardMethod),
+         unit=hardUnit) %>% #no soft units
+  mutate(var=factor(var), 
+         method=factor(method), 
+         unit=factor(unit),
+         value=as.numeric(value)) %>%
+  select(-hardUnit, -hardMethod)
+
+ggplot(Shaw$wide %>% select(lat, lon, observation_date) %>%
+  mutate_all(funs(as.numeric))) +
+  geom_histogram(aes(observation_date))
+
+mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
+#ggplot() + mapWorld
+ggplot(Shaw$wide %>% 
+         select(lat, lon, observation_date) %>%
+         mutate_all(funs(as.numeric)) %>%
+         mutate(decade = floor(observation_date/10)*10)) +
+  mapWorld + 
+  geom_hex(aes(x=lon, y=lat), bins=50) + 
+  #geom_point(aes(x=lon, y=lat)) +
+  theme_bw() +
+  theme(text=element_text(size=18),
+        legend.text=element_text(size=10),
+        axis.title=element_blank()) +
+  facet_wrap(~decade)
+
+ggplot(Shaw$long) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~var+unit, scale='free')
 ```
