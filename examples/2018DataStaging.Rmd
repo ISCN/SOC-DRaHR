@@ -19,7 +19,13 @@ library(fiftystater)
 dataDir <- '~/Documents/Datasets/temp' #rename if you prefer a different local director
 ```
 
-```{r Moore2015, eval=FALSE, echo=FALSE}
+# Moore et al 2015
+ 
+ Manuscript citation: Moore JAM, Jiang J, Patterson CM, Mayes MA, Wang G, Classen AT (2015) Interactions among roots, mycorrhizae and free-living microbial communities differentially impact soil carbon processes. Journal of Ecology 103(6): 1442-1453. https://doi.org/10.1111/1365-2745.12484
+ 
+ Data link: https://doi.org/10.5061/dryad.pb271
+ 
+```{r Moore2015}
 downloadURL <- 'https://datadryad.org/bitstream/handle/10255/dryad.97546/Moore%202015%20Final%20Data.csv?sequence=1'
 
 
