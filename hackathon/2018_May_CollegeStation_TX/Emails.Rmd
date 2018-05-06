@@ -1,0 +1,41 @@
+---
+title: "Emails to participants"
+author: "K Todd-Brown (ktoddbrown@gmail.com)"
+date: "5/6/2018"
+output: html_document
+---
+
+# Student profile
+
+Question | YES	| NO 
+---|--|--
+Git: Do you know what git is?	| 13	| 4
+Git: Have you ever added and committed changes to a git repository?	| 7	| 10
+Git: Have you ever cloned a remote repository?	| 7	| 10
+Git: Have you ever forked a repository and submitted a pull request? |	5 |	12
+Git: Have you ever resolved a merge conflict?	| 3	| 14
+R: Have you ever read in a csv file? | 15 | 2
+R: Have you ever made a graph in R?	| 13 | 4
+R: Have you ever written an R function?	| 9	| 8
+R: Have you ever written a Rmarkdown document?	| 4	| 13
+R: Have you ever used the tidyverse family of libraries? | 7 | 10
+
+R: Have you submitted a package to CRAN or otherwise maintained an R package? | 1 | 16
+
+# Email sent out day before hackathon
+
+Dear Data Hackers!
+
+Welcome to the C-PEAT soil data hackathon. We are excited to see you tomorrow and wanted to pass along some links to help get you started.
+
+First, we will be working to produce a harmonized data product over the next two days so you'll want to have a laptop with you. If you don't have a laptop don't worry, there will be folks there who you can pair up with. Don't forget your charging cable. 
+
+Please install R, git, bash and nano; instructions at the bottom of this page https://swcarpentry.github.io/workshop-template/ (there are also instructions for Python, SQLite, and OpenRefine that you can ignore).
+
+The two main repositories we will be working with are here: https://github.com/ISCN/soilDataR and https://github.com/ISCN/SOC-DRaHR These links will be useful during the workshop but you don't need to do anything before hand with them.
+
+We will start at 9AM in the OM building, in room 807 (on the 8th floor). Coffee, water, snacks, and lunch will be provided. 
+
+Email us with any questions and we are looking forward to seeing everyone tomorrow!
+-Julie Loisel
+-Kathe Todd-Brown
