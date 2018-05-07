@@ -20,7 +20,8 @@ R: Have you ever written an R function?	| 9	| 8
 R: Have you ever written a Rmarkdown document?	| 4	| 13
 R: Have you ever used the tidyverse family of libraries? | 7 | 10
 
-R: Have you submitted a package to CRAN or otherwise maintained an R package? | 1 | 16
+R: Have you submitted a package to CRAN or otherwise maintained a package? | 1 | 16
+
 
 # Email sent out day before hackathon
 

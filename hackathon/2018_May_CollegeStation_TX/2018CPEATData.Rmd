@@ -1,0 +1,185 @@
+---
+title: "Data from C-PEAT"
+author: "C-PEAT and Texas A&M Hackers"
+date: "5/7/2018"
+output: 
+  html_document: 
+    toc: yes
+---
+
+```{r setup}
+library(tidyverse)
+```
+
+```{r eval=FALSE}
+library(googledrive)
+##pull all the files that we are working with for the hacakthon from the google drive
+file.ls <- drive_ls(path='Professional/Data Hackathon TAMU 2018')
+cat(sprintf('# %s \n\n', sort(file.ls$name)))
+```
+
+# Start here
+
+1) Fork the main repository https://github.com/ISCN/SOC-DRaHR
+2) Start by going to the master file and claiming a data file to work on. https://docs.google.com/spreadsheets/d/1hXyCW5TkLrt7en7tcz43lWHPxl5vVtG9qlkcr6t3zBs/edit?usp=sharing
+3) Download your claimed data file from the google drive to a tempoary directory that you DO NOT commit to the repository https://drive.google.com/open?id=1k7CwjDePBuounwCMU1UFcWEsBlvwReWt
+    - Do not commit data to the repository. The pull request will be denied.
+4) Hack!
+    1) Read in each table on the sheet
+    2) If data is a soil measurement convert to a long table, otherwise keep wide
+        - make sure entries are cross referenced and try to use informative unique ids
+    3) Convert soil depth to top/bottom depth
+    4) Convert to ISCN naming scheme and seperate units; see CPEAT_key.csv
+    5) Plot data in histograms and map lat/lon; eyeball to make sure everything looks right
+5) Add to your local git repository and push to your remote repository
+6) Submit a pull request to the main repository
+7) Claim your contributor status!
+8) Repeat 1-6 until no data left
+
+Remember to:
+
+1) Steal shamelessly and credit generously.
+2) Ask Google; then ask your neighbor; then ask an 'expert'.
+3) Celebrate new and interesting mistakes.
+4) There is ALWAYS more then one way to do something.
+5) Document your code like you're passing it onto a dear friend to maintain.
+
+## Useful notes
+Any useful notes you find can go here for now: https://docs.google.com/document/d/1WeqesuFO--5AhQHQywNzdYSIoR9dctklhLjmCZy1chk/edit?usp=sharing
+They will be transcribed to this document after the hackathon.
+
+# Data ingest scripts
+
+## 86-Kvartal.csv 
+
+## Aero.csv 
+
+## Altay.csv 
+
+## Bear.csv 
+
+## Burnt_Village.csv 
+
+## Covey_Hill.csv 
+
+## D127.csv 
+
+## E110.csv 
+
+## Ennadai.csv 
+
+## Glen_Carron.csv 
+
+## Glen_Torridon.csv 
+
+## Goldeye.csv 
+
+## HL02.csv 
+
+## Hongyuan.csv 
+
+## Horse_Trail.csv 
+
+## JBL1.csv 
+
+## JBL2.csv 
+
+## JBL3.csv 
+
+## JBL4.csv 
+
+## JBL5.csv 
+
+## JBL7.csv 
+
+## JBL8.csv 
+
+## Joey.csv 
+
+## KAM12-C1.csv 
+
+## KAM12-C4.csv 
+
+## Kenai_Gasfield.csv 
+
+## KJ2-3.csv 
+
+## KUJU.csv 
+
+## La_Grande2.csv 
+
+## La_Grande3.csv 
+
+## Lac_Le_Caron.csv 
+
+## Lake396.csv 
+
+## Lake785.csv 
+
+## Lebel.csv 
+
+## Lompolojankka.csv 
+
+## Mariana.csv 
+
+## Martin.csv 
+
+## Mosaik.csv 
+
+## No_Name_Creek.csv 
+
+## Nuikluk.csv 
+
+## NW-BG.csv 
+
+## Ours.csv 
+
+## Patuanak.csv 
+
+## Petersville.csv 
+
+## Petite_Bog.csv 
+
+## Plaine.csv 
+
+## Rogovaya.csv 
+
+## Saarisuo.csv 
+
+## Selwyn.csv 
+
+## Shuttle.csv 
+
+## SIB06.csv 
+
+## Sidney.csv 
+
+## Siikaneva.csv 
+
+## Slave.csv 
+
+## Sterne.csv 
+
+## Stordalen.csv 
+
+## Sundance.csv 
+
+## Swanson.csv 
+
+## T1.csv 
+
+## Unit.csv 
+
+## Upper_Pinto.csv 
+
+## Usinsk.csv 
+
+## Utikuma.csv 
+
+## V34.csv 
+
+## Vasyugan.csv 
+
+## VC04-06.csv 
+
+## Zoige.csv
