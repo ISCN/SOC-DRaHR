@@ -60,6 +60,31 @@ They will be transcribed to this document after the hackathon.
 
 ## Burnt_Village.csv 
 
+```{r Burnt_village}
+
+dataFile <- 'C:/Users/Kritika/Documents/Hackathon/Burnt_Village.csv' #data location on your computer
+
+allData <- read_csv(file=dataFile, skip =1) #big data table of everything!
+
+metaData <- allData[,1:2] %>% #first two columns at meta data
+  filter(!is.na(site_name)) %>% #remove empty rows
+  bind_rows(data.frame(site_name='site_name', Burnt_Village='Burnt_Village' )) %>% #transfers miss-identified headers to data table
+  spread(key=site_name, value = Burnt_Village) #convert long to wide
+
+sampleData01 <- allData[ ,5:14] %>% #identify columns for sample reads
+  gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format excludes columns that are characters not numerics
+  filter(!is.na(value)) %>% #remove missing values
+  mutate(value=as.numeric(value)) #make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
+  filter(!is.na(value))
+
+sampleData <- sampleData01
+  bind_rows(sampleData02) #combine this with previous sample
+
+```
+
 ## Covey_Hill.csv 
 
 ## D127.csv 
