@@ -123,6 +123,32 @@ They will be transcribed to this document after the hackathon.
 ## Mariana.csv 
 
 ## Martin.csv 
+```{r Martin}
+datafile <- "~/Documents/R_Studio/C-PEAT/Martin.csv" #data location on local machine
+allData <- read_csv(file = datafile, skip = 1) #giant data table of everything
+metaData <- allData[,1:2] %>% #read first two columns as metadata
+  filter(!is.na(site_name)) %>% #remove empty rows
+  bind_rows(data.frame(site_name = "site_name", Martin = "Martin", 
+                       stringsAsFactors = FALSE)) %>% #transfers misidentified 
+                                                      #...headers to data table
+  spread(key = site_name, value = Martin) #convert long data to wide format
+
+#
+sampleData <- allData[,5:14] %>% #identify columns for sample reads
+  gather(key = "header", value = "value", -depth) %>% #convert to long 
+                                        #...format, exclude columns that 
+                                        #...are characters (not numeric)
+  filter(!is.na(value)) %>% #remove missing values
+  mutate(value = as.numeric(value)) #make sure values are numerics
+
+sampleData <- allData[,17:23] %>% #identify columns for sample reads
+  rename(header = "date_type", value = "uncal_date_BP", depth = "depth_cm") %>% #harmonize
+                                            #...headernames to match previous samples
+  filter(!is.na(value)) %>%
+  bind_rows(sampleData) #combine this with previous sample data table
+
+```
+
 
 ## Mosaik.csv 
 
