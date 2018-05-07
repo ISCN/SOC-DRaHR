@@ -122,6 +122,13 @@ They will be transcribed to this document after the hackathon.
 
 ## Mariana.csv 
 
+```{r Mariana}
+dataFile <- '~/CPEAT_testing/Mariana.csv'
+allData <- read_csv(file=dataFile, skip=1)
+
+metaData <- allData[,1:2]
+```
+
 ## Martin.csv 
 
 ## Mosaik.csv 
