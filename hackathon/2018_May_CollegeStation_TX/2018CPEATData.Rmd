@@ -279,6 +279,46 @@ View(sampleData) #check to make sure it looks ok
 
 ## Lac_Le_Caron.csv 
 
+```{r Lac_Le_Caron}
+dataFile <- '~/Documents/Science_et_al/C-PEAT/Lac_Le_Caron.csv' #data location on your computer
+
+allData <- read.csv(file=dataFile, skip=1) #big data table of everything
+
+metaData <- allData[,1:2] %>% 
+#read first two columns as meta data
+  filter(!is.na(site_name) & !grepl("^\\s*$", site_name)) %>% 
+#remove empty rows
+  bind_rows(data.frame(site_name='site_name', Lac_Le_Caron='Lac_Le_Caron', stringsAsFactors=FALSE)) %>%
+#transfers miss-identified headers to data table
+  spread(key=site_name, value=Lac_Le_Caron) #convert long to wide
+
+#zero is the surface, 1 is the  
+sampleData01 <- allData[ ,5:14] %>% 
+#identify columns for sample reads 
+  gather(key='header', value='value', -depth, -peat_type) %>% 
+#convert to long format exclude columns that are characters not numerics
+  filter(!is.na(value)) %>%
+#remove missing values
+  mutate(value=as.numeric(value))
+#make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% 
+#identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>%
+#harmonize header names to match previous samples
+  filter(!is.na(value))
+  
+sampleData <- sampleData01 %>%
+  bind_rows(sampleData02)
+#combine this with previous samples
+
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales='free')
+#makes histograms for each column, as subplots in one figure  
+
+```
+
 ## Lake396.csv 
 
 ## Lake785.csv 
@@ -502,6 +542,44 @@ ggplot(metaData %>%
   theme(text=element_text(size=18),
         axis.title=element_blank())
 ```
+
+```{r Mosaik}
+dataFile <- '~/Documents/Science_et_al/C-PEAT/Mosaik.csv' #data location on your computer
+
+allData <- read.csv(file=dataFile, skip=1) #big data table of everything
+
+metaData <- allData[,1:2] %>% 
+#read first two columns as meta data
+  filter(!is.na(site_name) & !grepl("^\\s*$", site_name)) %>% 
+#remove empty rows
+  bind_rows(data.frame(site_name='site_name', Mosaik='Mosaik', stringsAsFactors=FALSE)) %>%
+#transfers miss-identified headers to data table
+  spread(key=site_name, value=Mosaik) #convert long to wide
+
+#zero is the surface, 1 is the  
+sampleData01 <- allData[ ,5:14] %>% 
+#identify columns for sample reads 
+  gather(key='header', value='value', -depth, -peat_type) %>% 
+#convert to long format exclude columns that are characters not numerics
+  filter(!is.na(value)) %>%
+#remove missing values
+  mutate(value=as.numeric(value))
+#make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% 
+#identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>%
+#harmonize header names to match previous samples
+  filter(!is.na(value))
+  
+sampleData <- sampleData01 %>%
+  bind_rows(sampleData02)
+#combine this with previous samples
+
+```
+
+
+read_csv(file=datafile, cols_integer(1:2))
 
 ## No_Name_Creek.csv 
 
