@@ -237,7 +237,7 @@ ggplot(metaData %>%
   geom_point(aes(x=longitude, y=latitude)) +
   theme_bw() +
   theme(text=element_text(size=18),
-        axis.title = element_blank())  
+        axis.title=element_blank())  
 ```
 
 ## Sundance.csv 
