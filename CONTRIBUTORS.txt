@@ -8,7 +8,9 @@ The following people identified soil data sets of interest:
   
 See SoilDataR [https://github.com/ktoddbrown/soilDataR/blob/master/DESCRIPTION] for individuals who contributed code and code review for data ingestion.
 
+  B Stockmaster <stockmaster@iodp.tamu.edu>, Texas A&M University
   Laurel B Childress <childress@iodp.tamu.edu> Texas A&M University
+
 
 The following people write reports for ingested data sets: 
   K Todd-Brown <ktoddbrown@gmail.com>, Pacific Northwest National Lab
