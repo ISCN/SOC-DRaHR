@@ -6,7 +6,9 @@ output: html_document
 ---
 
 ```{r setup}
-library(SoilDataR) #library(devtools); install_github("ISCN/soilDataR")
+library(SoilDataR) 
+library(devtools);
+install_github("ISCN/soilDataR")
 library(tidyverse)
 
 #mapping librarys to help with global/regional plots
@@ -16,7 +18,7 @@ library(mapdata)
 library(fiftystater)
 
 #dataDir <- tempdir() #if you want to download to a temp directory
-dataDir <- '~/Documents/Datasets/temp' #rename if you prefer a different local director
+dataDir <- '/Users/bbking/Desktop/workshop/testingStuff' #rename if you prefer a different local director
 ```
 
 # Moore et al 2015
