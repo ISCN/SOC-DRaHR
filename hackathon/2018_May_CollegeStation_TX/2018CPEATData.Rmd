@@ -207,6 +207,47 @@ ggplot(metaData %>%
 ## Horse_Trail.csv 
 
 ## JBL1.csv 
+```{r JBL1}
+datafile<-'~/Documents/JBL1/JBL1.csv'
+allData<- read.csv(file=datafile, skip=1) #skip first row to avoid header
+
+View(allData) #check to make sure it looks ok
+
+metaData<- allData[, 1:2] %>% #pull just 1-2
+    filter(!is.na(site_name) & !grepl ('^\\s*$', site_name)) %>% #remove empty rows 
+    bind_rows((tibble(site_name = "site_name", JBL1 = 'JBL1'))) %>% 
+     spread(key="site_name", value="JBL1") #exclude strings - anything thats not a numerical value 
+
+View(metaData) #check to make sure it looks ok
+
+grepl('^\\s*$', c('abc', '1234', 'asdfadc 13','', ' ', '\t')) #TEST 
+
+sampleData01<- allData[, 5:14] %>% #identify columns for sample reads
+    gather (key= 'header', value='value', -depth, -peat_type) %>% #convert to long format, exclude columns that are characters not numbers
+    filter(!is.na(value) & !grepl('^\\s*$', value))%>% #remove empty rows
+    mutate(value=as.numeric(value)) # make sure values are numeric
+#peat type is all NA - fix at the end - use the peatland type listed in metaData "sphagnum_bog"
+
+View(sampleData01) #check to make sure it looks ok
+
+
+sampleData02<- allData[, 17:20] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
+  filter(!is.na(value) & !grepl ('^\\s*$', value)) #remove empty rows
+  
+
+
+View(sampleData02) #check to make sure it looks ok
+         
+sampleData<- sampleData01 %>%
+  bind_rows(sampleData02) %>% #combine with previous samples
+  mutate(peat_type = metaData$peatland_type) #sets peatland type
+#sweep and re run chunk to test
+
+
+View(sampleData) #check to make sure it looks ok
+
+```
 
 ## JBL2.csv 
 
