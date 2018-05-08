@@ -205,20 +205,39 @@ dataFile <- '~/CPEAT_workshop/Stordalen.csv' #file path of data
 allData <- read_csv(file=dataFile, skip=1) #big data table of everything
 
 metaData <- allData[,1:2] %>% #read first two columns as metadata
-  filter(!is.na(site_name)) %>% #remove empty rows
+  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>% #remove empty rows
   bind_rows(data.frame(site_name='site_name', Stordalen='Stordalen'))   %>% #transfers misidentified headers to data table
   spread(key=site_name, value=Stordalen) #convert table from long to wide
 
-sampleData_1 <- allData[ ,5:14] %>%
+sampleData01 <- allData[ ,5:14] %>%
   gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format exclude columns that are characters not numerics
-  filter(!is.na(value)) %>% #remove missing values
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
   mutate(value=as.numeric(value)) #make sure values are numerics
 
-sampleData_2 <- allData[ ,17:23] %>% #identify columns for age
+sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
-  filter(!is.na(value)) #remove missing values
-  sampleData <- sampleData_1 %>%
-  bind_rows(sampleData_2) #combine with previous samples
+  filter(!is.na(value) & !grepl('^\\s*$', value)) #remove missing values
+  sampleData <- sampleData01 %>%
+  bind_rows(sampleData02) #combine with previous samples
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales = 'free')
+
+#mapping libraries to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
+ggplot(metaData %>%
+         mutate_at(vars(latitude, longitude), as.numeric)) + 
+  mapWorld +
+  geom_point(aes(x=longitude, y=latitude)) +
+  theme_bw() +
+  theme(text=element_text(size=18),
+        axis.title = element_blank())  
 ```
 
 ## Sundance.csv 
