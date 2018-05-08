@@ -5,6 +5,7 @@ The following people identified soil data sets of interest:
   Samuel C Zipper <samuelczipper@gmail.com>, University of Victoria
   H Lu <luharmony@gmail.com>, Stanford University
   S Tumber-Davila <stumber@stanford.edu>, Stanford University
+  Y Zhu<yzhu@tamu.edu>, Texas A&M University
   
 See SoilDataR [https://github.com/ktoddbrown/soilDataR/blob/master/DESCRIPTION] for individuals who contributed code and code review for data ingestion.
 
