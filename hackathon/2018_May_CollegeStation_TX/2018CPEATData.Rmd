@@ -228,6 +228,43 @@ ggplot(metaData %>%
 
 ## Kenai_Gasfield.csv 
 
+```{r Kenai_Gasfield}
+
+
+dataFile <- '~/Documents/Git_Workshop/SOC-DRaHR/hackathon/2018_May_CollegeStation_TX/Workshop/Kenai_Gasfield.csv'
+allData <- read_csv(file = dataFile, skip=1)
+metaData <- allData[,1:2] %>%
+  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
+  bind_rows(data.frame(site_name="site_name", Kenai_Gasfield="Kenai_Gasfield",
+                       stringsAsFactors = FALSE)) %>%
+  spread(key=site_name, value=Kenai_Gasfield)
+
+sampleData <- allData[,5:14] %>%
+  gather(key='header', value='value', -depth, -peat_type) %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  mutate(value=as.numeric(value))
+
+sampleData <- allData[,17:23] %>%
+  rename(header="date_type", value='uncal_date_BP', depth='depth_cm') %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  bind_rows(sampleData)
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales = 'free')
+
+MapWorld <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
+ggplot(metaData %>%
+         mutate_at(vars(latitude, longitude), as.numeric)) + 
+  MapWorld +
+  geom_point(aes(x=longitude, y=latitude)) +
+  theme_light()
+theme(text=element_text(size=18),
+      axis.title=element_blank())
+         
+
+```
+
 ## KJ2-3.csv 
 
 ## KUJU.csv 
@@ -283,9 +320,108 @@ theme(text=element_text(size=18),
 ```
 ## Mariana.csv 
 
+```{r Mariana}
+
+##Core One
+
+dataFile <- '~/Documents/Git_Workshop/SOC-DRaHR/hackathon/2018_May_CollegeStation_TX/Workshop/Mariana.csv'
+allData <- read_csv(file = dataFile, skip=1)
+metaData_Core1 <- allData[,1:2] %>%
+  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
+  bind_rows(data.frame(site_name="site_name", Mariana="Mariana",
+                       stringsAsFactors = FALSE)) %>%
+  spread(key=site_name, value=Mariana)
+
+sampleData_Core1 <- allData[,7:16] %>%
+  gather(key='header', value='value', -depth, -peat_type) %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  mutate(value=as.numeric(value))
+
+sampleData_Core1 <- allData[,19:25] %>%
+  rename(header="date_type", value='uncal_date_BP', depth='depth_cm') %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  bind_rows(sampleData_Core1)
+  
+ggplot(sampleData_Core1) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales = 'free')
+
+MapWorld <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
+ggplot(metaData_Core1 %>%
+         mutate_at(vars(latitude, longitude), as.numeric)) + 
+  MapWorld +
+  geom_point(aes(x=longitude, y=latitude)) +
+  theme_light()
+theme(text=element_text(size=18),
+      axis.title=element_blank())
+         
+##Core Two
+
+metaData_Core2 <- allData[,c(1,3)] %>%
+  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
+  bind_rows(data.frame(site_name="site_name", Mariana_1="Mariana_1",
+                       stringsAsFactors = FALSE)) %>%
+  spread(key=site_name, value=Mariana_1)
+
+sampleData_Core2 <- allData[,28:37] %>%
+  gather(key='header', value='value', -depth_1, -peat_type_1) %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  mutate(value=as.numeric(value))
+
+sampleData_Core2 <- allData[,40:46] %>%
+  rename(header="date_type_1", value='uncal_date_BP_1', depth='depth_cm_1') %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  bind_rows(sampleData_Core2)
+
+ggplot(sampleData_Core2) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales = 'free')
+
+MapWorld_Core2 <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
+ggplot(metaData_Core2 %>%
+         mutate_at(vars(latitude, longitude), as.numeric)) + 
+  MapWorld_Core2 +
+  geom_point(aes(x=longitude, y=latitude)) +
+  theme_light()
+theme(text=element_text(size=18),
+      axis.title=element_blank())
+
+##Core Three
+
+metaData_Core3 <- allData[,c(1,4)] %>%
+  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
+  bind_rows(data.frame(site_name="site_name", Mariana_2="Mariana_2",
+                       stringsAsFactors = FALSE)) %>%
+  spread(key=site_name, value=Mariana_2)
+
+sampleData_Core3 <- allData[,49:58] %>%
+  gather(key='header', value='value', -depth_2, -peat_type_2) %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  mutate(value=as.numeric(value))
+
+sampleData_Core3 <- allData[,61:67] %>%
+  rename(header="date_type_2", value='uncal_date_BP_2', depth='depth_cm_2') %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  bind_rows(sampleData_Core3)
+
+ggplot(sampleData_Core3) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales = 'free')
+
+MapWorld_Core3 <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
+ggplot(metaData_Core3 %>%
+         mutate_at(vars(latitude, longitude), as.numeric)) + 
+  MapWorld_Core3 +
+  geom_point(aes(x=longitude, y=latitude)) +
+  theme_light()
+theme(text=element_text(size=18),
+      axis.title=element_blank())
+
+```
+
 ## Martin.csv 
 ```{r Martin}
-datafile <- "~/Documents/R_Studio/C-PEAT/Martin.csv" #data location on local machine
+datafile <- "~/Documents/Git_Workshop/SOC-DRaHR/hackathon/2018_May_CollegeStation_TX/Workshop/Martin.csv" #data location on local machine
 allData <- read_csv(file = datafile, skip = 1) #giant data table of everything
 metaData <- allData[,1:2] %>% #read first two columns as metadata
   filter(!is.na(site_name) & !grepl("^\\s*$", site_name)) %>% #remove empty rows
@@ -320,15 +456,15 @@ ggplot(metaData %>%
          mutate_at(vars(latitude, longitude), as.numeric)) + 
           #change the lat and long from character to numeric
   mapWorld +
-  geom_point(aes(x=longitude, y=latitude), color = "red", size = 3) +
+  geom_point(aes(x=longitude, y=latitude), color = "red", size = 2.5) +
   theme_classic() +
   theme(text = element_text(size=18),
                 axis.title=element_blank())
 
-mapWorld <- borders("world", colour = "gray80", fill = "gray90")
 
 ```
 
+##OR
 
 ```{r Martin}
 
