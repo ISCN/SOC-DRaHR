@@ -223,6 +223,42 @@ theme(text=element_text(size=18),
 ## Saarisuo.csv 
 
 ## Selwyn.csv 
+```{r Selwyn}
+
+
+dataFile <- '~/Documents/Git_Workshop/SOC-DRaHR/hackathon/2018_May_CollegeStation_TX/Workshop/Selwyn.csv'
+allData <- read_csv(file = dataFile, skip=1)
+metaData <- allData[,1:2] %>%
+  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
+  bind_rows(data.frame(site_name="site_name", Selwyn="Selwyn",
+                       stringsAsFactors = FALSE)) %>%
+  spread(key=site_name, value=Selwyn)
+
+sampleData <- allData[,5:14] %>%
+  gather(key='header', value='value', -depth, -peat_type) %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  mutate(value=as.numeric(value))
+
+sampleData <- allData[,17:23] %>%
+  rename(header="date_type", value='uncal_date_BP', depth='depth_cm') %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  bind_rows(sampleData)
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales = 'free')
+
+MapWorld <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
+ggplot(metaData %>%
+         mutate_at(vars(latitude, longitude), as.numeric)) + 
+  MapWorld +
+  geom_point(aes(x=longitude, y=latitude)) +
+  theme_light()
+theme(text=element_text(size=18),
+      axis.title=element_blank())
+         
+
+```
 
 ## Shuttle.csv 
 
