@@ -218,7 +218,74 @@ theme(text=element_text(size=18),
 
 ## Plaine.csv 
 
-## Rogovaya.csv 
+## Rogovaya.csv
+```{r Rogovaya}
+
+##Core One
+
+dataFile <- '~/Documents/Git_Workshop/SOC-DRaHR/hackathon/2018_May_CollegeStation_TX/Workshop/Rogovaya.csv'
+allData <- read_csv(file = dataFile, skip=1)
+metaData_Core1 <- allData[,1:2] %>%
+  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
+  bind_rows(data.frame(site_name="site_name", Rogovaya="Rogovaya",
+                       stringsAsFactors = FALSE)) %>%
+  spread(key=site_name, value=Rogovaya)
+
+sampleData_Core1 <- allData[,6:15] %>%
+  gather(key='header', value='value', -depth, -peat_type) %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  mutate(value=as.numeric(value))
+
+sampleData_Core1 <- allData[,18:24] %>%
+  rename(header="date_type", value='uncal_date_BP', depth='depth_cm') %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  bind_rows(sampleData_Core1)
+  
+ggplot(sampleData_Core1) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales = 'free')
+
+MapWorld <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
+ggplot(metaData_Core1 %>%
+         mutate_at(vars(latitude, longitude), as.numeric)) + 
+  MapWorld +
+  geom_point(aes(x=longitude, y=latitude)) +
+  theme_light()
+theme(text=element_text(size=18),
+      axis.title=element_blank())
+         
+##Core Two
+
+metaData_Core2 <- allData[,c(1,3)] %>%
+  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
+  bind_rows(data.frame(site_name="site_name", Rogovaya_1="Rogovaya_1",
+                       stringsAsFactors = FALSE)) %>%
+  spread(key=site_name, value=Rogovaya_1)
+
+sampleData_Core2 <- allData[,27:36] %>%
+  gather(key='header', value='value', -depth_1, -peat_type_1) %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  mutate(value=as.numeric(value))
+
+sampleData_Core2 <- allData[,39:45] %>%
+  rename(header="date_type_1", value='uncal_date_BP_1', depth='depth_cm_1') %>%
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
+  bind_rows(sampleData_Core2)
+
+ggplot(sampleData_Core2) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales = 'free')
+
+MapWorld_Core2 <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
+ggplot(metaData_Core2 %>%
+         mutate_at(vars(latitude, longitude), as.numeric)) + 
+  MapWorld_Core2 +
+  geom_point(aes(x=longitude, y=latitude)) +
+  theme_light()
+theme(text=element_text(size=18),
+      axis.title=element_blank())
+
+```
 
 ## Saarisuo.csv 
 
