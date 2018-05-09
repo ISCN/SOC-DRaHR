@@ -10,4 +10,4 @@ See SoilDataR [https://github.com/ktoddbrown/soilDataR/blob/master/DESCRIPTION] 
 
 The following people write reports for ingested data sets: 
   K Todd-Brown <ktoddbrown@gmail.com>, Pacific Northwest National Lab
-  
+  Edith Sotelo <sotelog.edith@gmail.com> Texas A&M University
