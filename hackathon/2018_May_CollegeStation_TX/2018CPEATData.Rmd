@@ -111,6 +111,53 @@ ggplot(metaData %>%
 ## Covey_Hill.csv 
 
 ## D127.csv 
+```{r D127}
+
+dataFile <- 'C:/Users/Kritika/Documents/Hackathon/D127.csv' #data location on your computer
+
+allData <- read_csv(file=dataFile, skip =1) #big data table of everything!
+
+metaData <- allData[,1:2] %>% #first two columns at meta data
+  filter(!is.na(site_name) ) %>% #remove empty rows
+  bind_rows(data.frame(site_name='site_name', D127='D127' )) %>% #transfers miss-identified headers to data table
+  spread(key=site_name, value = D127) #convert long to wide
+
+sampleData01 <- allData[ ,5:14] %>% #identify columns for sample reads
+  gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format excludes columns that are characters not numerics
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
+  mutate(value=as.numeric(value)) #make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
+  filter(!is.na(value) & !grepl('^\\s*$', value))
+
+sampleData <- sampleData01
+  bind_rows(sampleData02) #combine this with previous sample
+  
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales='free')
+
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+mapWorld <- ggplot2::borders("world", colour='gray80', fill='gray80') #create a layer of borders
+
+ggplot()+mapWorld
+
+ggplot(metaData %>%
+         mutate_at(vars(latitude,longitude), as.numeric))+
+  mapWorld+
+  geom_point(aes(x=longitude, y = latitude)) +
+  theme_bw()+ 
+  theme(text=element_text(size=18), axis.title=element_blank())
+
+```
 
 ## E110.csv 
 
@@ -119,6 +166,54 @@ ggplot(metaData %>%
 ## Glen_Carron.csv 
 
 ## Glen_Torridon.csv 
+```{r Glen_Torridon}
+
+dataFile <- 'C:/Users/Kritika/Documents/Hackathon/Glen_Torridon.csv' #data location on your computer
+
+allData <- read_csv(file=dataFile, skip =1) #big data table of everything!
+
+metaData <- allData[,1:2] %>% #first two columns at meta data
+  filter(!is.na(site_name) ) %>% #remove empty rows
+  bind_rows(data.frame(site_name='site_name', Glen_Torridon='Glen_Torridon' )) %>% #transfers miss-identified headers to data table
+  spread(key=site_name, value = Glen_Torridon) #convert long to wide
+
+sampleData01 <- allData[ ,5:14] %>% #identify columns for sample reads
+  gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format excludes columns that are characters not numerics
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
+  mutate(value=as.numeric(value)) #make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
+  filter(!is.na(value) & !grepl('^\\s*$', value))
+
+sampleData <- sampleData01
+  bind_rows(sampleData02) #combine this with previous sample
+  
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales='free')
+
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+mapWorld <- ggplot2::borders("world", colour='gray80', fill='gray80') #create a layer of borders
+
+ggplot()+mapWorld
+
+ggplot(metaData %>%
+         mutate_at(vars(latitude,longitude), as.numeric))+
+  mapWorld+
+  geom_point(aes(x=longitude, y = latitude)) +
+  theme_bw()+ 
+  theme(text=element_text(size=18), axis.title=element_blank())
+
+```
+
 
 ## Goldeye.csv 
 ```{r Goldeye}
@@ -170,6 +265,53 @@ ggplot(metaData %>%
 ```
 
 ## HL02.csv 
+```{r HL02}
+
+dataFile <- 'C:/Users/Kritika/Documents/Hackathon/HL02.csv' #data location on your computer
+
+allData <- read_csv(file=dataFile, skip =1) #big data table of everything!
+
+metaData <- allData[,1:2] %>% #first two columns at meta data
+  filter(!is.na(site_name) ) %>% #remove empty rows
+  bind_rows(data.frame(site_name='site_name', HL02='HL02' )) %>% #transfers miss-identified headers to data table
+  spread(key=site_name, value = HL02) #convert long to wide
+
+sampleData01 <- allData[ ,5:14] %>% #identify columns for sample reads
+  gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format excludes columns that are characters not numerics
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
+  mutate(value=as.numeric(value)) #make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
+  filter(!is.na(value) & !grepl('^\\s*$', value))
+
+sampleData <- sampleData01
+  bind_rows(sampleData02) #combine this with previous sample
+  
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales='free')
+
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+mapWorld <- ggplot2::borders("world", colour='gray80', fill='gray80') #create a layer of borders
+
+ggplot()+mapWorld
+
+ggplot(metaData %>%
+         mutate_at(vars(latitude,longitude), as.numeric))+
+  mapWorld+
+  geom_point(aes(x=longitude, y = latitude)) +
+  theme_bw()+ 
+  theme(text=element_text(size=18), axis.title=element_blank())
+
+```
 
 ## Hongyuan.csv 
 
@@ -178,17 +320,294 @@ ggplot(metaData %>%
 ## JBL1.csv 
 
 ## JBL2.csv 
+```{r JBL2}
+
+dataFile <- 'C:/Users/Kritika/Documents/Hackathon/JBL2.csv' #data location on your computer
+
+allData <- read_csv(file=dataFile, skip =1) #big data table of everything!
+
+metaData <- allData[,1:2] %>% #first two columns at meta data
+  filter(!is.na(site_name) ) %>% #remove empty rows
+  bind_rows(data.frame(site_name='site_name', JBL2='JBL2' )) %>% #transfers miss-identified headers to data table
+  spread(key=site_name, value = JBL2) #convert long to wide
+
+sampleData01 <- allData[ ,5:14] %>% #identify columns for sample reads
+  gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format excludes columns that are characters not numerics
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
+  mutate(value=as.numeric(value)) #make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
+  filter(!is.na(value) & !grepl('^\\s*$', value))
+
+sampleData <- sampleData01
+  bind_rows(sampleData02) #combine this with previous sample
+  
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales='free')
+
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+mapWorld <- ggplot2::borders("world", colour='gray80', fill='gray80') #create a layer of borders
+
+ggplot()+mapWorld
+
+ggplot(metaData %>%
+         mutate_at(vars(latitude,longitude), as.numeric))+
+  mapWorld+
+  geom_point(aes(x=longitude, y = latitude)) +
+  theme_bw()+ 
+  theme(text=element_text(size=18), axis.title=element_blank())
+
+```
 
 ## JBL3.csv 
+```{r JBL3}
 
+dataFile <- 'C:/Users/Kritika/Documents/Hackathon/JBL3.csv' #data location on your computer
+
+allData <- read_csv(file=dataFile, skip =1) #big data table of everything!
+
+metaData <- allData[,1:2] %>% #first two columns at meta data
+  filter(!is.na(site_name) ) %>% #remove empty rows
+  bind_rows(data.frame(site_name='site_name', JBL3='JBL3' )) %>% #transfers miss-identified headers to data table
+  spread(key=site_name, value = JBL3) #convert long to wide
+
+sampleData01 <- allData[ ,5:14] %>% #identify columns for sample reads
+  gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format excludes columns that are characters not numerics
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
+  mutate(value=as.numeric(value)) #make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
+  filter(!is.na(value) & !grepl('^\\s*$', value))
+
+sampleData <- sampleData01
+  bind_rows(sampleData02) #combine this with previous sample
+  
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales='free')
+
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+mapWorld <- ggplot2::borders("world", colour='gray80', fill='gray80') #create a layer of borders
+
+ggplot()+mapWorld
+
+ggplot(metaData %>%
+         mutate_at(vars(latitude,longitude), as.numeric))+
+  mapWorld+
+  geom_point(aes(x=longitude, y = latitude)) +
+  theme_bw()+ 
+  theme(text=element_text(size=18), axis.title=element_blank())
+
+```
 ## JBL4.csv 
+```{r JBL4}
 
+dataFile <- 'C:/Users/Kritika/Documents/Hackathon/JBL4.csv' #data location on your computer
+
+allData <- read_csv(file=dataFile, skip =1) #big data table of everything!
+
+metaData <- allData[,1:2] %>% #first two columns at meta data
+  filter(!is.na(site_name) ) %>% #remove empty rows
+  bind_rows(data.frame(site_name='site_name', JBL4='JBL4' )) %>% #transfers miss-identified headers to data table
+  spread(key=site_name, value = JBL4) #convert long to wide
+
+sampleData01 <- allData[ ,5:14] %>% #identify columns for sample reads
+  gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format excludes columns that are characters not numerics
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
+  mutate(value=as.numeric(value)) #make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
+  filter(!is.na(value) & !grepl('^\\s*$', value))
+
+sampleData <- sampleData01
+  bind_rows(sampleData02) #combine this with previous sample
+  
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales='free')
+
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+mapWorld <- ggplot2::borders("world", colour='gray80', fill='gray80') #create a layer of borders
+
+ggplot()+mapWorld
+
+ggplot(metaData %>%
+         mutate_at(vars(latitude,longitude), as.numeric))+
+  mapWorld+
+  geom_point(aes(x=longitude, y = latitude)) +
+  theme_bw()+ 
+  theme(text=element_text(size=18), axis.title=element_blank())
+
+```
 ## JBL5.csv 
+```{r JBL5}
 
+dataFile <- 'C:/Users/Kritika/Documents/Hackathon/JBL5.csv' #data location on your computer
+
+allData <- read_csv(file=dataFile, skip =1) #big data table of everything!
+
+metaData <- allData[,1:2] %>% #first two columns at meta data
+  filter(!is.na(site_name) ) %>% #remove empty rows
+  bind_rows(data.frame(site_name='site_name', JBL5='JBL5' )) %>% #transfers miss-identified headers to data table
+  spread(key=site_name, value = JBL5) #convert long to wide
+
+sampleData01 <- allData[ ,5:14] %>% #identify columns for sample reads
+  gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format excludes columns that are characters not numerics
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
+  mutate(value=as.numeric(value)) #make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
+  filter(!is.na(value) & !grepl('^\\s*$', value))
+
+sampleData <- sampleData01
+  bind_rows(sampleData02) #combine this with previous sample
+  
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales='free')
+
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+mapWorld <- ggplot2::borders("world", colour='gray80', fill='gray80') #create a layer of borders
+
+ggplot()+mapWorld
+
+ggplot(metaData %>%
+         mutate_at(vars(latitude,longitude), as.numeric))+
+  mapWorld+
+  geom_point(aes(x=longitude, y = latitude)) +
+  theme_bw()+ 
+  theme(text=element_text(size=18), axis.title=element_blank())
+
+```
 ## JBL7.csv 
+```{r JBL7}
 
+dataFile <- 'C:/Users/Kritika/Documents/Hackathon/JBL7.csv' #data location on your computer
+
+allData <- read_csv(file=dataFile, skip =1) #big data table of everything!
+
+metaData <- allData[,1:2] %>% #first two columns at meta data
+  filter(!is.na(site_name) ) %>% #remove empty rows
+  bind_rows(data.frame(site_name='site_name', JBL7='JBL7' )) %>% #transfers miss-identified headers to data table
+  spread(key=site_name, value = JBL7) #convert long to wide
+
+sampleData01 <- allData[ ,5:14] %>% #identify columns for sample reads
+  gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format excludes columns that are characters not numerics
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
+  mutate(value=as.numeric(value)) #make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
+  filter(!is.na(value) & !grepl('^\\s*$', value))
+
+sampleData <- sampleData01
+  bind_rows(sampleData02) #combine this with previous sample
+  
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales='free')
+
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+mapWorld <- ggplot2::borders("world", colour='gray80', fill='gray80') #create a layer of borders
+
+ggplot()+mapWorld
+
+ggplot(metaData %>%
+         mutate_at(vars(latitude,longitude), as.numeric))+
+  mapWorld+
+  geom_point(aes(x=longitude, y = latitude)) +
+  theme_bw()+ 
+  theme(text=element_text(size=18), axis.title=element_blank())
+
+```
 ## JBL8.csv 
+```{r JBL8}
 
+dataFile <- 'C:/Users/Kritika/Documents/Hackathon/JBL8.csv' #data location on your computer
+
+allData <- read_csv(file=dataFile, skip =1) #big data table of everything!
+
+metaData <- allData[,1:2] %>% #first two columns at meta data
+  filter(!is.na(site_name) ) %>% #remove empty rows
+  bind_rows(data.frame(site_name='site_name', JBL8='JBL8' )) %>% #transfers miss-identified headers to data table
+  spread(key=site_name, value = JBL8) #convert long to wide
+
+sampleData01 <- allData[ ,5:14] %>% #identify columns for sample reads
+  gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format excludes columns that are characters not numerics
+  filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
+  mutate(value=as.numeric(value)) #make sure values are numerics
+
+sampleData02 <- allData[ ,17:23] %>% #identify columns for age
+  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
+  filter(!is.na(value) & !grepl('^\\s*$', value))
+
+sampleData <- sampleData01
+  bind_rows(sampleData02) #combine this with previous sample
+  
+  
+ggplot(sampleData) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header, scales='free')
+
+
+#mapping librarys to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+mapWorld <- ggplot2::borders("world", colour='gray80', fill='gray80') #create a layer of borders
+
+ggplot()+mapWorld
+
+ggplot(metaData %>%
+         mutate_at(vars(latitude,longitude), as.numeric))+
+  mapWorld+
+  geom_point(aes(x=longitude, y = latitude)) +
+  theme_bw()+ 
+  theme(text=element_text(size=18), axis.title=element_blank())
+
+```
 ## Joey.csv 
 
 ## KAM12-C1.csv 
