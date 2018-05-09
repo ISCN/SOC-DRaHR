@@ -80,7 +80,7 @@ sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
   filter(!is.na(value) & !grepl('^\\s*$', value))
 
-sampleData <- sampleData01
+sampleData <- sampleData01 %>%
   bind_rows(sampleData02) #combine this with previous sample
   
   
@@ -131,7 +131,7 @@ sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
   filter(!is.na(value) & !grepl('^\\s*$', value))
 
-sampleData <- sampleData01
+sampleData <- sampleData01 %>%
   bind_rows(sampleData02) #combine this with previous sample
   
   
@@ -186,7 +186,7 @@ sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
   filter(!is.na(value) & !grepl('^\\s*$', value))
 
-sampleData <- sampleData01
+sampleData <- sampleData01 %>%
   bind_rows(sampleData02) #combine this with previous sample
   
   
@@ -236,7 +236,7 @@ sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
   filter(!is.na(value) & !grepl('^\\s*$', value))
 
-sampleData <- sampleData01
+sampleData <- sampleData01 %>%
   bind_rows(sampleData02) #combine this with previous sample
   
   
@@ -285,7 +285,7 @@ sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
   filter(!is.na(value) & !grepl('^\\s*$', value))
 
-sampleData <- sampleData01
+sampleData <- sampleData01 %>%
   bind_rows(sampleData02) #combine this with previous sample
   
   
@@ -340,7 +340,7 @@ sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
   filter(!is.na(value) & !grepl('^\\s*$', value))
 
-sampleData <- sampleData01
+sampleData <- sampleData01 %>%
   bind_rows(sampleData02) #combine this with previous sample
   
   
@@ -389,7 +389,7 @@ sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
   filter(!is.na(value) & !grepl('^\\s*$', value))
 
-sampleData <- sampleData01
+sampleData <- sampleData01 %>%
   bind_rows(sampleData02) #combine this with previous sample
   
   
@@ -437,7 +437,7 @@ sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
   filter(!is.na(value) & !grepl('^\\s*$', value))
 
-sampleData <- sampleData01
+sampleData <- sampleData01 %>%
   bind_rows(sampleData02) #combine this with previous sample
   
   
@@ -485,7 +485,7 @@ sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
   filter(!is.na(value) & !grepl('^\\s*$', value))
 
-sampleData <- sampleData01
+sampleData <- sampleData01 %>%
   bind_rows(sampleData02) #combine this with previous sample
   
   
@@ -533,7 +533,7 @@ sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
   filter(!is.na(value) & !grepl('^\\s*$', value))
 
-sampleData <- sampleData01
+sampleData <- sampleData01 %>%
   bind_rows(sampleData02) #combine this with previous sample
   
   
@@ -581,7 +581,7 @@ sampleData02 <- allData[ ,17:23] %>% #identify columns for age
   rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>% #harmonize header names to match previous samples
   filter(!is.na(value) & !grepl('^\\s*$', value))
 
-sampleData <- sampleData01
+sampleData <- sampleData01 %>%
   bind_rows(sampleData02) #combine this with previous sample
   
   
