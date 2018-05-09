@@ -6,7 +6,9 @@ output: html_document
 ---
 
 # Google drive
+
 https://drive.google.com/open?id=1WeqesuFO--5AhQHQywNzdYSIoR9dctklhLjmCZy1chk
+
 https://drive.google.com/open?id=1V9DHJdKiiDhb91rfAnvOhw0WefDDVLqa
 
 # Student profile
@@ -44,3 +46,4 @@ We will start at 9AM in the OM building, in room 807 (on the 8th floor). Coffee,
 Email us with any questions and we are looking forward to seeing everyone tomorrow!
 -Julie Loisel
 -Kathe Todd-Brown
+

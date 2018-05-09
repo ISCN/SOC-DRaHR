@@ -51,6 +51,7 @@ They will be transcribed to this document after the hackathon.
 # Data ingest scripts
 
 ## 86-Kvartal.csv 
+
 ```{r 86-Kvartal}
 dataFile <- '~/CPEAT_workshop/86-Kvartal.csv' #file path of data 
 allData <- read_csv(file=dataFile, skip=1) #big data table of everything
@@ -91,9 +92,11 @@ ggplot(metaData %>%
         axis.title=element_blank())  
 ```
 
+
 ## Aero.csv 
 
 ## Altay.csv 
+
 ```{r Altay}
 dataFile <- '~/CPEAT_workshop/Altay.csv' #file path of data 
 allData <- read_csv(file=dataFile, skip=1) #big data table of everything
@@ -133,6 +136,7 @@ ggplot(metaData %>%
   theme(text=element_text(size=18),
         axis.title=element_blank())  
 ```
+
 
 ## Bear.csv 
 
@@ -207,6 +211,7 @@ ggplot(metaData %>%
 ## Horse_Trail.csv 
 
 ## JBL1.csv 
+
 ```{r JBL1}
 datafile<-'~/Documents/JBL1/JBL1.csv'
 allData<- read.csv(file=datafile, skip=1) #skip first row to avoid header
@@ -249,6 +254,7 @@ View(sampleData) #check to make sure it looks ok
 
 ```
 
+
 ## JBL2.csv 
 
 ## JBL3.csv 
@@ -268,6 +274,7 @@ View(sampleData) #check to make sure it looks ok
 ## KAM12-C4.csv 
 
 ## Kenai_Gasfield.csv 
+
 
 ```{r Kenai_Gasfield}
 
@@ -305,7 +312,6 @@ theme(text=element_text(size=18),
          
 
 ```
-
 ## KJ2-3.csv 
 
 ## KUJU.csv 
@@ -356,6 +362,7 @@ ggplot(sampleData) +
 
 ```
 
+
 ## Lake396.csv 
 
 ## Lake785.csv 
@@ -363,6 +370,7 @@ ggplot(sampleData) +
 ## Lebel.csv 
 
 ## Lompolojankka.csv 
+
 ```{r Lompolojankka}
 
 
@@ -628,6 +636,13 @@ ggplot(metaData %>%
   theme(text=element_text(size=18),
         axis.title = element_blank())
 ```
+=======
+
+## Mariana.csv 
+
+## Martin.csv 
+
+## Mosaik.csv 
 
 ```{r Mosaik}
 dataFile <- '~/Documents/Datasets/CPEAT/Mosaik.csv' #data location on your computer
@@ -678,44 +693,6 @@ ggplot(metaData %>%
   theme(text=element_text(size=18),
         axis.title=element_blank())
 ```
-
-```{r Mosaik}
-dataFile <- '~/Documents/Science_et_al/C-PEAT/Mosaik.csv' #data location on your computer
-
-allData <- read.csv(file=dataFile, skip=1) #big data table of everything
-
-metaData <- allData[,1:2] %>% 
-#read first two columns as meta data
-  filter(!is.na(site_name) & !grepl("^\\s*$", site_name)) %>% 
-#remove empty rows
-  bind_rows(data.frame(site_name='site_name', Mosaik='Mosaik', stringsAsFactors=FALSE)) %>%
-#transfers miss-identified headers to data table
-  spread(key=site_name, value=Mosaik) #convert long to wide
-
-#zero is the surface, 1 is the  
-sampleData01 <- allData[ ,5:14] %>% 
-#identify columns for sample reads 
-  gather(key='header', value='value', -depth, -peat_type) %>% 
-#convert to long format exclude columns that are characters not numerics
-  filter(!is.na(value)) %>%
-#remove missing values
-  mutate(value=as.numeric(value))
-#make sure values are numerics
-
-sampleData02 <- allData[ ,17:23] %>% 
-#identify columns for age
-  rename(header='date_type', value='uncal_date_BP', depth='depth_cm') %>%
-#harmonize header names to match previous samples
-  filter(!is.na(value))
-  
-sampleData <- sampleData01 %>%
-  bind_rows(sampleData02)
-#combine this with previous samples
-
-```
-
-
-read_csv(file=datafile, cols_integer(1:2))
 
 ## No_Name_Creek.csv 
 
@@ -805,6 +782,7 @@ theme(text=element_text(size=18),
 ## Saarisuo.csv 
 
 ## Selwyn.csv 
+
 ```{r Selwyn}
 
 
@@ -855,6 +833,7 @@ theme(text=element_text(size=18),
 ## Sterne.csv 
 
 ## Stordalen.csv 
+
 ```{r Stordalen}
 dataFile <- '~/CPEAT_workshop/Stordalen.csv' #file path of data 
 allData <- read_csv(file=dataFile, skip=1) #big data table of everything
@@ -894,6 +873,7 @@ ggplot(metaData %>%
   theme(text=element_text(size=18),
         axis.title=element_blank())  
 ```
+
 
 ## Sundance.csv 
 
