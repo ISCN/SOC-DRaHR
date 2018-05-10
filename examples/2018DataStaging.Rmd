@@ -6,9 +6,10 @@ output: html_document
 ---
 
 ```{r setup}
-#install_github("ISCN/soilDataR")
-library(devtools)
-library(SoilDataR) #
+
+#library(devtools); install_github("ISCN/soilDataR")
+library(SoilDataR)
+
 library(tidyverse)
 
 #mapping librarys to help with global/regional plots
