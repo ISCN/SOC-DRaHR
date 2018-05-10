@@ -7,8 +7,21 @@ output:
     toc: yes
 ---
 
+# Set Up
 ```{r setup}
 library(tidyverse)
+
+#mapping libraries to help with global/regional plots
+library(ggmap)
+library(maps)
+library(mapdata)
+library(fiftystater)
+
+```
+
+```{r download}
+data.dir <- '~/Documents/Datasets/CPEAT/Data Hackathon TAMU 2018/'
+#This will be filled in later when we have the data DOI links assigned
 ```
 
 ```{r eval=FALSE}
@@ -16,6 +29,106 @@ library(googledrive)
 ##pull all the files that we are working with for the hacakthon from the google drive
 file.ls <- drive_ls(path='Professional/Data Hackathon TAMU 2018')
 cat(sprintf('# %s \n\n', sort(file.ls$name)))
+```
+
+```{r readInCPEAT2018May}
+
+readInCPEAT2018May <- function(filename, #where is the download
+                               metaCol=1:2, #what rows define the metadata for the core
+                               data01Col=5:14, #row index of non-isotope data for the core
+                               data01nonNum=c('peat_type'), #what is not a number in the non-isotope
+                               data02Col=17:23, #row index of isotope data
+                               debug=FALSE){ #pass through a copy of the raw data read
+  
+  #big data table of everything without headers
+  allData <- read_csv(file=filename, skip=1, col_names=FALSE, 
+                      col_types=paste0(rep('c', max(c(metaCol, data01Col, data02Col))), collapse='')) 
+  
+  #initalize the list we'll pass the answer to
+  ans <- list()
+  
+  #append the raw read if we are in debug mode
+  if(debug){
+    ans$rawRead <- allData
+  }
+  
+  #There are no headers
+  ans$site <- allData[,metaCol] #read first two columns as metadata
+  names(ans$site) <- c('X1', 'X2') #force namings
+  
+  ans$site <- ans$site %>%
+    filter(!is.na(X1) & !grepl('^\\s*$', X1)) %>% #remove empty rows
+    spread(key=X1, value=X2) #convert table from long to wide
+  
+  #the rest of the data has a header, rename the columns
+  names(allData) <- allData[1,]
+  allData <- allData[-1,]
+  
+  #construct a table with the the depths
+  depthTable <- allData[, data01Col] %>% 
+    select(depth) %>% filter(!is.na(depth)) %>% 
+    mutate(layer_mid=as.numeric(depth),
+           layer_top=as.numeric(NA),
+           layer_bottom=as.numeric(NA)) %>%
+    arrange(layer_mid)
+  
+  depthTable$layer_top[1] <- 0
+  depthTable$layer_bottom[1] <- depthTable$layer_mid[1]*2
+  for(ii in 2:nrow(depthTable)){
+    depthTable$layer_top[ii] <- depthTable$layer_bottom[ii-1]
+    depthTable$layer_bottom[ii] <- (depthTable$layer_mid[ii]-depthTable$layer_top[ii]) + depthTable$layer_mid[ii]
+  }
+  
+  ##Pull the non-isotope data table
+  sampleData01 <- allData[, data01Col] %>%
+    gather(key='header', value='value', -depth, -one_of(data01nonNum)) %>%
+    #gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format exclude columns that are characters not numerics
+    filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
+    mutate(value=as.numeric(value)) %>% #make sure values are numerics
+    left_join(depthTable, by='depth') %>%
+    mutate(layer_name=paste(ans$site$core_name, depth, sep='_'))
+  
+  ##Pull the isotope data table
+  sampleData02 <- allData[ ,data02Col] %>% #identify columns for age
+    rename(header='date_type', 
+           value='uncal_date_BP', 
+           sigma='lab_uncertainty_yrs',
+           depth='depth_cm') %>% #harmonize header names to match previous samples
+    filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
+    mutate(unit=if_else(grepl('A.D.$', value), 'non standard', 'date_BP'),
+           layer_name=paste(ans$site$core_name, depth, sep='_'),
+           layer_mid=as.numeric(depth),
+           layer_top=as.numeric(depth)-as.numeric(thickness_cm)/2,
+           layer_bottom=as.numeric(depth)+as.numeric(thickness_cm)/2) %>%
+    mutate(value=gsub(' A.D.$', '', value)) %>% #break out so that we don't confuse unit def
+    group_by(layer_name, header, layer_top, layer_bottom, value, sigma, unit) %>%
+    gather(key='key', value='text', material, labe_code) %>%
+    summarize(method = paste0(sprintf('%s: %s', key, text), collapse='; ')) %>%
+    ungroup() %>%
+    mutate(value=as.numeric(value),
+           sigma=as.numeric(sigma))
+  
+  ##Construct the layer description to add to wide table
+  layer_description <- sampleData01 %>% ungroup() %>%
+    select(layer_name, layer_top, layer_bottom,
+           one_of(c('peat_type'))) %>%
+    full_join(sampleData02 %>% ungroup ()%>%
+                select(layer_name, layer_top, layer_bottom), 
+              by=c("layer_name", "layer_top", "layer_bottom")) %>%
+    arrange(layer_top) %>% unique()
+  
+  ans$layer <- data.frame(layer_description, ans$site %>% select(site_name))
+  
+  ##construct long data table
+  ans$sample <- sampleData01 %>%
+    bind_rows(sampleData02) %>% #combine with previous samples
+    select(layer_name, header, value, sigma, unit)
+  
+  
+  return(ans)
+}
+
+temp <- readInCPEAT2018May(filename=file.path(data.dir, "Covey_Hill.csv"))
 ```
 
 # Start here
@@ -49,6 +162,80 @@ Any useful notes you find can go here for now: https://docs.google.com/document/
 They will be transcribed to this document after the hackathon.
 
 # Data ingest scripts
+
+```{r loadFiles}
+
+allFiles <- c( "86-Kvartal.csv", "Aero.csv", 
+  "Altay.csv", "Bear.csv", "Burnt_Village.csv", "Covey_Hill.csv", #8
+  "D127.csv", "E110.csv", "Ennadai.csv", "Glen_Carron.csv", #12
+  "Glen_Torridon.csv", "Goldeye.csv", "HL02.csv", "Hongyuan.csv", #16
+  "Horse_Trail.csv", "JBL1.csv", "JBL2.csv", "JBL3.csv", #20
+  "JBL4.csv", "JBL5.csv", "JBL7.csv", "JBL8.csv", #24
+  "Joey.csv", "KAM12-C1.csv", "KAM12-C4.csv", "Kenai_Gasfield.csv", #28
+  "KJ2-3.csv", "KUJU.csv", "La_Grande2.csv", "La_Grande3.csv", #32
+  "Lac_Le_Caron.csv", "Lake396.csv", "Lake785.csv", "Lebel.csv", #36
+  "Lompolojankka.csv", "Mariana.csv", "Martin.csv", "Mosaik.csv", #40           
+  "No_Name_Creek.csv", "Nuikluk.csv", "NW-BG.csv", "Ours.csv", #44
+  "Patuanak.csv", "Petersville.csv", "Petite_Bog.csv", "Plaine.csv", #48
+  "Rogovaya.csv", "Saarisuo.csv", "Selwyn.csv", "Shuttle.csv", #52
+  "SIB06.csv", "Sidney.csv", "Siikaneva.csv", "Slave.csv", #56
+  "Sterne.csv", "Stordalen.csv", "Sundance.csv", "Swanson.csv", #60
+  "T1.csv", "Unit.csv", "Upper_Pinto.csv", "Usinsk.csv", #64
+  "Utikuma.csv", "V34.csv", "Vasyugan.csv", "VC04-06.csv", #68
+  "Zoige.csv")
+questionable_date <- c('Covey_Hill.csv')
+bad_header <- c('Burnt_Village.csv')
+multiple_cores <- c('Joey.csv', 'Lebel.csv', 'Mariana.csv', 'Nuikluk.csv',
+              'NW-BG.csv', 'Ours.csv', 'Plaine.csv', "Rogovaya.csv", "Sundance.csv")
+ans <- list(long=data.frame(), wide=data.frame())
+for(rootname in setdiff(allFiles, c(questionable_date, bad_header, multiple_cores))){
+  temp <- readInCPEAT2018May(filename=file.path(data.dir, rootname), debug=TRUE)
+  
+  ans$sample <- ans$sample %>%
+    bind_rows(temp$sample)
+  ans$layer <- ans$layer %>%
+    bind_rows(temp$layer)
+  ans$site <- ans$site %>%
+    bind_rows(temp$site)
+}
+```
+
+```{r plotEverything}
+plot.df <- ans$sample %>%
+           left_join(ans$layer %>% select(layer_name, site_name), by='layer_name')
+
+for(oneSite in ans$site$site_name[1:9]){
+
+  print(ggplot(plot.df %>% filter(site_name==oneSite)) +
+          #geom_histogram(data=plot.df %>% sample_n(sum(plot.df$site_name==oneSite)),
+          #               aes(x=value), fill='grey') +
+          geom_histogram(aes(x=value)) +
+          facet_wrap(~header+unit, scales='free') +
+          labs(title=oneSite)) 
+  
+  mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
+  print(ggplot(ans$site %>% select(site_name, latitude, longitude) %>%
+           #filter(site_name %in% ans$site$site_name[1:8]) %>%
+           mutate_at(vars(latitude, longitude), as.numeric)) + 
+    mapWorld +
+    geom_point(aes(x=longitude, y=latitude)) +
+    geom_point(aes(x=longitude[site_name==oneSite], y=latitude[site_name==oneSite]), color='red') +
+    theme_bw() +
+    theme(text=element_text(size=18),
+          axis.title=element_blank()) +
+    labs(title=oneSite))
+
+}
+
+problematicLayers <- ans$layer %>% filter(layer_top > layer_bottom) %>%
+  select(site_name) %>% unique
+
+ggplot(ans$layer %>% filter(site_name %in% problematicLayers$site_name[1:9])) +
+  geom_point(aes(x=layer_top, y=layer_bottom)) +
+  facet_wrap(~site_name, scales='free')
+
+print(problematicLayers$site_name)
+```
 
 ## 86-Kvartal.csv 
 
