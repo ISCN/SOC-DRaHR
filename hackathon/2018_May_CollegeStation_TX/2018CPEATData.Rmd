@@ -56,7 +56,7 @@ They will be transcribed to this document after the hackathon.
 ```{r Aero}
 library(tidyverse)
 
-dataFile<-'./csv_data/Aero.csv'
+dataFile<-'~/Documents/csv_data/Aero.csv'
 
 # skip first row
 allData<-read.csv(file=dataFile, skip=1)
@@ -133,7 +133,7 @@ ggplot(metaData %>%
 ```{r Ennadai}
 library(tidyverse)
 
-dataFile<-'./csv_data/Ennadai.csv'
+dataFile<-'~/Documents/csv_data/Ennadai.csv'
 
 # skip first row
 allData<-read.csv(file=dataFile, skip=1)
@@ -205,7 +205,8 @@ ggplot(metaData %>%
 
 ## Hongyuan.csv
 ```{r Hongyuan}
-dataFile <- './csv_data/Hongyuan.csv' #data location on your computer
+library(tidyverse)
+dataFile <- '~/Documents/csv_data/Hongyuan.csv' #data location on your computer
 
 allData <- read_csv(file=dataFile, skip=1) #big data table of everything!
 
@@ -367,7 +368,7 @@ ggplot(metaData %>%
 ```{r Zoige}
 library(tidyverse)
 
-dataFile<-'./csv_data/Zoige.csv'
+dataFile<-'~/Documents/csv_data/Zoige.csv'
 
 # skip first row
 allData<-read.csv(file=dataFile, skip=1)
