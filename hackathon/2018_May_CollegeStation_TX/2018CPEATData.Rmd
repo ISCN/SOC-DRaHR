@@ -13,7 +13,6 @@ library(tidyverse)
 
 #mapping libraries to help with global/regional plots
 library(ggmap)
-library(maps)
 library(mapdata)
 library(fiftystater)
 
@@ -41,8 +40,7 @@ readInCPEAT2018May <- function(filename, #where is the download
                                debug=FALSE){ #pass through a copy of the raw data read
   
   #big data table of everything without headers
-  allData <- read_csv(file=filename, skip=1, col_names=FALSE, 
-                      col_types=paste0(rep('c', max(c(metaCol, data01Col, data02Col))), collapse='')) 
+  allData <- read_csv(file=filename, skip=1, col_names=FALSE) 
   
   #initalize the list we'll pass the answer to
   ans <- list()
@@ -96,12 +94,12 @@ readInCPEAT2018May <- function(filename, #where is the download
            sigma='lab_uncertainty_yrs',
            depth='depth_cm') %>% #harmonize header names to match previous samples
     filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
-    mutate(unit=if_else(grepl('A.D.$', value), 'non standard', 'date_BP'),
+    mutate(unit=if_else(grepl('\\D', value), 'non standard', 'date_BP'),
            layer_name=paste(ans$site$core_name, depth, sep='_'),
            layer_mid=as.numeric(depth),
            layer_top=as.numeric(depth)-as.numeric(thickness_cm)/2,
            layer_bottom=as.numeric(depth)+as.numeric(thickness_cm)/2) %>%
-    mutate(value=gsub(' A.D.$', '', value)) %>% #break out so that we don't confuse unit def
+    mutate(value=gsub('\\D+', '', value)) %>% #break out so that we don't confuse unit def
     group_by(layer_name, header, layer_top, layer_bottom, value, sigma, unit) %>%
     gather(key='key', value='text', material, labe_code) %>%
     summarize(method = paste0(sprintf('%s: %s', key, text), collapse='; ')) %>%
@@ -164,7 +162,7 @@ They will be transcribed to this document after the hackathon.
 
 # Data ingest scripts
 
-```{r loadFiles}
+```{r loadFiles, message=FALSE}
 
 allFiles <- c( "86-Kvartal.csv", "Aero.csv", 
   "Altay.csv", "Bear.csv", "Burnt_Village.csv", "Covey_Hill.csv", #8
@@ -185,46 +183,60 @@ allFiles <- c( "86-Kvartal.csv", "Aero.csv",
   "Utikuma.csv", "V34.csv", "Vasyugan.csv", "VC04-06.csv", #68
   "Zoige.csv")
 
-bad_colWidth <- c('Lebel.csv', 'Plaine.csv')
-
-##TODO
-multiple_cores <- c('Joey.csv', 'Mariana.csv', 'NW-BG.csv', 'Ours.csv')
-two_cores <- c('Nuikluk.csv', "Rogovaya.csv", "Sundance.csv")
+missingPeat_type <- c('Lebel.csv', 'Plaine.csv')
 badCasting <- c('Selwyn.csv', 'Upper_Pinto.csv')
 
+multiple_cores <- c('Joey.csv'=6, 'Mariana.csv'=3, 'NW-BG.csv'=4, 'Ours.csv'=3, 
+                    'Nuikluk.csv'=2, "Rogovaya.csv"=2, "Sundance.csv"=2)
 
-ans <- list(long=data.frame(), wide=data.frame())
-for(rootname in setdiff(allFiles, c(multiple_cores, two_cores, badCasting))){
+ans <- list(sample=data.frame(), layer=data.frame(), site=data.frame())
+for(rootname in allFiles){
   #print(rootname)
-  if(rootname %in% bad_colWidth){
-    temp <- readInCPEAT2018May(filename=file.path(data.dir, rootname),
-                               data01Col = 5:13, data01nonNum = c(), 
-                               data02Col = 16:22, debug=TRUE)
+  if(rootname %in% names(multiple_cores)){
+    numCores <- multiple_cores[rootname]
   }else{
-    temp <- readInCPEAT2018May(filename=file.path(data.dir, rootname), debug=TRUE)
+    numCores <- 1
   }
   
-  ans$sample <- ans$sample %>%
-    bind_rows(temp$sample)
-  ans$layer <- ans$layer %>%
-    bind_rows(temp$layer)
-  ans$site <- ans$site %>%
-    bind_rows(temp$site)
+  if(rootname %in% missingPeat_type){
+    nonNumHeader <- c()
+    secondTable <- 5:13
+    thirdTable <- 16:22
+  }else{
+    nonNumHeader <- c("peat_type")
+    secondTable <- 5:14
+    thirdTable <- 17:23
+  }
+  
+  for(offset in (1:numCores)-1){
+      temp <- readInCPEAT2018May(filename=file.path(data.dir, rootname),
+                                 metaCol=c(1, 2+offset),
+                                 data01Col = secondTable+numCores-1, data01nonNum = nonNumHeader, 
+                                 data02Col = thirdTable+numCores-1, debug=TRUE)
+    
+    
+    ans$sample <- ans$sample %>%
+      bind_rows(temp$sample)
+    ans$layer <- ans$layer %>%
+      bind_rows(temp$layer)
+    ans$site <- ans$site %>%
+      bind_rows(temp$site)
+  }
 }
+```
 
+```{r reportTrouble}
 ##Recode bad C14 header
 ans$sample <- ans$sample %>% mutate(header = recode(header, C14 = '14C'))
 
-##Sort out non-standard dates TODO
+## TODO Sort out non-standard dates
 ans$sample %>% filter(unit == 'non standard') %>% print
+## TODO Sort out bad uncertainty entries in badCasting <- c('Selwyn.csv', 'Upper_Pinto.csv')
 ```
 
 ```{r plotEverything}
 plot.df <- ans$sample %>%
            left_join(ans$layer %>% select(layer_name, site_name), by='layer_name')
-ggplot(plot.df) +
-          geom_histogram(aes(x=value)) +
-          facet_wrap(~header+unit, scales='free') 
 
 for(oneSite in ans$site$site_name[1]){
 
@@ -234,14 +246,16 @@ for(oneSite in ans$site$site_name[1]){
           geom_histogram(aes(x=value)) +
           facet_wrap(~header+unit, scales='free') +
           labs(title=oneSite)) 
-  
-  mapWorld <- borders("world", colour="gray80", fill="gray80") # create a layer of borders
+
   print(ggplot(ans$site %>% select(site_name, latitude, longitude) %>%
            #filter(site_name %in% ans$site$site_name[1:8]) %>%
            mutate_at(vars(latitude, longitude), as.numeric)) + 
-    mapWorld +
+    borders("world", colour="gray80", fill="gray80") + # create a layer of borders
     geom_point(aes(x=longitude, y=latitude)) +
-    geom_point(aes(x=longitude[site_name==oneSite], y=latitude[site_name==oneSite]), color='red') +
+    geom_point(data=ans$site %>% select(site_name, latitude, longitude) %>%
+           filter(site_name == oneSite) %>%
+           mutate_at(vars(latitude, longitude), as.numeric),
+                 aes(x=longitude[site_name==oneSite], y=latitude[site_name==oneSite]), color='red') +
     theme_bw() +
     theme(text=element_text(size=18),
           axis.title=element_blank()) +
@@ -249,239 +263,21 @@ for(oneSite in ans$site$site_name[1]){
 
 }
 
+ggplot(plot.df) +
+  geom_histogram(aes(x=value)) +
+  facet_wrap(~header+unit, scales='free') +
+  labs(title='All C-PEAT Data')
+
+ggplot(ans$site %>% select(site_name, latitude, longitude) %>%
+         mutate_at(vars(latitude, longitude), as.numeric)) + 
+  borders("world", colour="gray80", fill="gray80") + # create a layer of borders
+  geom_point(aes(x=longitude, y=latitude), alpha=0.3) +
+  theme_bw() +
+  theme(text=element_text(size=18),
+        axis.title=element_blank())
+
 problematicLayers <- ans$layer %>% filter(layer_top > layer_bottom) %>%
   select(site_name) %>% unique
 
-ggplot(ans$layer %>% filter(site_name %in% problematicLayers$site_name[1:9])) +
-  geom_point(aes(x=layer_top, y=layer_bottom)) +
-  facet_wrap(~site_name, scales='free')
-
 print(problematicLayers$site_name)
 ```
-
-## Covey_Hill.csv 
-
-## Joey.csv 
-
-## Lebel.csv 
-
-## Mariana.csv 
-
-```{r Mariana}
-
-##Core One
-
-dataFile <- '~/Documents/Git_Workshop/SOC-DRaHR/hackathon/2018_May_CollegeStation_TX/Workshop/Mariana.csv'
-allData <- read_csv(file = dataFile, skip=1)
-metaData_Core1 <- allData[,1:2] %>%
-  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
-  bind_rows(data.frame(site_name="site_name", Mariana="Mariana",
-                       stringsAsFactors = FALSE)) %>%
-  spread(key=site_name, value=Mariana)
-
-sampleData_Core1 <- allData[,7:16] %>%
-  gather(key='header', value='value', -depth, -peat_type) %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  mutate(value=as.numeric(value))
-
-sampleData_Core1 <- allData[,19:25] %>%
-  rename(header="date_type", value='uncal_date_BP', depth='depth_cm') %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  bind_rows(sampleData_Core1)
-  
-ggplot(sampleData_Core1) +
-  geom_histogram(aes(x=value)) +
-  facet_wrap(~header, scales = 'free')
-
-MapWorld <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
-ggplot(metaData_Core1 %>%
-         mutate_at(vars(latitude, longitude), as.numeric)) + 
-  MapWorld +
-  geom_point(aes(x=longitude, y=latitude)) +
-  theme_light()
-theme(text=element_text(size=18),
-      axis.title=element_blank())
-         
-##Core Two
-
-metaData_Core2 <- allData[,c(1,3)] %>%
-  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
-  bind_rows(data.frame(site_name="site_name", Mariana_1="Mariana_1",
-                       stringsAsFactors = FALSE)) %>%
-  spread(key=site_name, value=Mariana_1)
-
-sampleData_Core2 <- allData[,28:37] %>%
-  gather(key='header', value='value', -depth_1, -peat_type_1) %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  mutate(value=as.numeric(value))
-
-sampleData_Core2 <- allData[,40:46] %>%
-  rename(header="date_type_1", value='uncal_date_BP_1', depth='depth_cm_1') %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  bind_rows(sampleData_Core2)
-
-ggplot(sampleData_Core2) +
-  geom_histogram(aes(x=value)) +
-  facet_wrap(~header, scales = 'free')
-
-MapWorld_Core2 <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
-ggplot(metaData_Core2 %>%
-         mutate_at(vars(latitude, longitude), as.numeric)) + 
-  MapWorld_Core2 +
-  geom_point(aes(x=longitude, y=latitude)) +
-  theme_light()
-theme(text=element_text(size=18),
-      axis.title=element_blank())
-
-##Core Three
-
-metaData_Core3 <- allData[,c(1,4)] %>%
-  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
-  bind_rows(data.frame(site_name="site_name", Mariana_2="Mariana_2",
-                       stringsAsFactors = FALSE)) %>%
-  spread(key=site_name, value=Mariana_2)
-
-sampleData_Core3 <- allData[,49:58] %>%
-  gather(key='header', value='value', -depth_2, -peat_type_2) %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  mutate(value=as.numeric(value))
-
-sampleData_Core3 <- allData[,61:67] %>%
-  rename(header="date_type_2", value='uncal_date_BP_2', depth='depth_cm_2') %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  bind_rows(sampleData_Core3)
-
-ggplot(sampleData_Core3) +
-  geom_histogram(aes(x=value)) +
-  facet_wrap(~header, scales = 'free')
-
-MapWorld_Core3 <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
-ggplot(metaData_Core3 %>%
-         mutate_at(vars(latitude, longitude), as.numeric)) + 
-  MapWorld_Core3 +
-  geom_point(aes(x=longitude, y=latitude)) +
-  theme_light()
-theme(text=element_text(size=18),
-      axis.title=element_blank())
-
-```
-
-## Nuikluk.csv 
-
-## NW-BG.csv 
-
-## Ours.csv 
-
-## Plaine.csv 
-
-## Rogovaya.csv
-```{r Rogovaya}
-
-##Core One
-
-dataFile <- '~/Documents/Git_Workshop/SOC-DRaHR/hackathon/2018_May_CollegeStation_TX/Workshop/Rogovaya.csv'
-allData <- read_csv(file = dataFile, skip=1)
-metaData_Core1 <- allData[,1:2] %>%
-  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
-  bind_rows(data.frame(site_name="site_name", Rogovaya="Rogovaya",
-                       stringsAsFactors = FALSE)) %>%
-  spread(key=site_name, value=Rogovaya)
-
-sampleData_Core1 <- allData[,6:15] %>%
-  gather(key='header', value='value', -depth, -peat_type) %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  mutate(value=as.numeric(value))
-
-sampleData_Core1 <- allData[,18:24] %>%
-  rename(header="date_type", value='uncal_date_BP', depth='depth_cm') %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  bind_rows(sampleData_Core1)
-  
-ggplot(sampleData_Core1) +
-  geom_histogram(aes(x=value)) +
-  facet_wrap(~header, scales = 'free')
-
-MapWorld <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
-ggplot(metaData_Core1 %>%
-         mutate_at(vars(latitude, longitude), as.numeric)) + 
-  MapWorld +
-  geom_point(aes(x=longitude, y=latitude)) +
-  theme_light()
-theme(text=element_text(size=18),
-      axis.title=element_blank())
-         
-##Core Two
-
-metaData_Core2 <- allData[,c(1,3)] %>%
-  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
-  bind_rows(data.frame(site_name="site_name", Rogovaya_1="Rogovaya_1",
-                       stringsAsFactors = FALSE)) %>%
-  spread(key=site_name, value=Rogovaya_1)
-
-sampleData_Core2 <- allData[,27:36] %>%
-  gather(key='header', value='value', -depth_1, -peat_type_1) %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  mutate(value=as.numeric(value))
-
-sampleData_Core2 <- allData[,39:45] %>%
-  rename(header="date_type_1", value='uncal_date_BP_1', depth='depth_cm_1') %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  bind_rows(sampleData_Core2)
-
-ggplot(sampleData_Core2) +
-  geom_histogram(aes(x=value)) +
-  facet_wrap(~header, scales = 'free')
-
-MapWorld_Core2 <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
-ggplot(metaData_Core2 %>%
-         mutate_at(vars(latitude, longitude), as.numeric)) + 
-  MapWorld_Core2 +
-  geom_point(aes(x=longitude, y=latitude)) +
-  theme_light()
-theme(text=element_text(size=18),
-      axis.title=element_blank())
-
-```
-
-## Selwyn.csv 
-
-```{r Selwyn}
-
-
-dataFile <- '~/Documents/Git_Workshop/SOC-DRaHR/hackathon/2018_May_CollegeStation_TX/Workshop/Selwyn.csv'
-allData <- read_csv(file = dataFile, skip=1)
-metaData <- allData[,1:2] %>%
-  filter(!is.na(site_name) & !grepl('^\\s*$', site_name)) %>%
-  bind_rows(data.frame(site_name="site_name", Selwyn="Selwyn",
-                       stringsAsFactors = FALSE)) %>%
-  spread(key=site_name, value=Selwyn)
-
-sampleData <- allData[,5:14] %>%
-  gather(key='header', value='value', -depth, -peat_type) %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  mutate(value=as.numeric(value))
-
-sampleData <- allData[,17:23] %>%
-  rename(header="date_type", value='uncal_date_BP', depth='depth_cm') %>%
-  filter(!is.na(value) & !grepl('^\\s*$', value)) %>%
-  bind_rows(sampleData)
-  
-ggplot(sampleData) +
-  geom_histogram(aes(x=value)) +
-  facet_wrap(~header, scales = 'free')
-
-MapWorld <- ggplot2::borders("world", colour = "gray80", fill = "grey80") #creating a layer of borders
-ggplot(metaData %>%
-         mutate_at(vars(latitude, longitude), as.numeric)) + 
-  MapWorld +
-  geom_point(aes(x=longitude, y=latitude)) +
-  theme_light()
-theme(text=element_text(size=18),
-      axis.title=element_blank())
-         
-
-```
-
-## Sundance.csv 
-
-## Upper_Pinto.csv 
