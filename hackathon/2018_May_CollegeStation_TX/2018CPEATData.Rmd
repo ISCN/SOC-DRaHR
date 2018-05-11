@@ -20,7 +20,7 @@ library(fiftystater)
 ```
 
 ```{r download}
-data.dir <- '~/Documents/Datasets/CPEAT/Data Hackathon TAMU 2018/'
+data.dir <- '~/Documents/Datasets/Data Hackathon TAMU 2018'
 #This will be filled in later when we have the data DOI links assigned
 ```
 
@@ -187,8 +187,10 @@ questionable_date <- c('Covey_Hill.csv')
 bad_header <- c('Burnt_Village.csv')
 multiple_cores <- c('Joey.csv', 'Lebel.csv', 'Mariana.csv', 'Nuikluk.csv',
               'NW-BG.csv', 'Ours.csv', 'Plaine.csv', "Rogovaya.csv", "Sundance.csv")
+badCasting <- c('Selwyn.csv', 'Upper_Pinto.csv')
 ans <- list(long=data.frame(), wide=data.frame())
-for(rootname in setdiff(allFiles, c(questionable_date, bad_header, multiple_cores))){
+for(rootname in setdiff(allFiles, c(questionable_date, bad_header, multiple_cores, badCasting))){
+  print(rootname)
   temp <- readInCPEAT2018May(filename=file.path(data.dir, rootname), debug=TRUE)
   
   ans$sample <- ans$sample %>%
