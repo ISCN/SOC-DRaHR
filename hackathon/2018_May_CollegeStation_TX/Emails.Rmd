@@ -1,17 +1,112 @@
 ---
-title: "Emails to participants"
+title: "Emails to participants and workshop summary"
 author: "K Todd-Brown (ktoddbrown@gmail.com)"
 date: "5/6/2018"
 output: html_document
 ---
 
-# Google drive
+Overall the hackathon was a sucess from a learning prosective. 
+The participents had generally positive feedback on the lessons and structure of the workshop.
+The R live code demo and coding challenges were engaging and particular sucessful.
+The git explanation and demo was a little more rough, but an additional review on the second day and one-on-one attention with students resulted in half of the class submitting pull requests to the main repository.
+While there was no direct accessment of this, there was a general sense that the particpents learned what makes for a easy to work with dataset.
+
+From a data processing prospective much of the code submitted was redundent since the formats of the datasets were virtually identical.
+This resulted in the datasets being an ideal teaching tool but the resulting code that was submitted was quickly rendered redundent by a few hours of coding to generalize the scripts.
+We were able to identify issues with the datasets during the hackathon that will be addressed later by the primary PI.
+
+By the numbers:
+
+* 67 data sets lined up for processing
+* 25 data sets processed to wide/long format
+* 21 people signed up for the 2 day workshop
+* 19 people showed up at the begining of the first day
+* 14 new forks of the ISCN/SOC-DRaHR repository
+* 13 pull requests submitted to the ISCN/SOC-DRaHR
+* 11 people at the end of the second day
+* 8 authors submitted new code to the main repository
+* 2 days of workshop
+* 1 new function submitted to the ISCN/SoilDataR repository
+
+# Google drive links
 
 https://drive.google.com/open?id=1WeqesuFO--5AhQHQywNzdYSIoR9dctklhLjmCZy1chk
 
 https://drive.google.com/open?id=1V9DHJdKiiDhb91rfAnvOhw0WefDDVLqa
 
-# Student profile
+# Day 1 feedback
+
+##Transcript of feedback stickies
+
+###Morning
+In the morning we went over R and git. There were some techinqual issues with the computer set up for the room that forced us to use a computer that led to install issues when trying to cover Rmarkdown.
+
+Try to improve this:
+
+- just my coding skills
+- Computational problems delayed course schedule
+- Just a lot to take in at once
+- Git was difficult wihtout prior knowledge of the language -> cheat sheet would help!
+- git was indeed cryptic - more overview or intro?
+- The R tutorial went a little fast. I wish we would see Rmarkdown
+- Maybe do a demo from star to finish - from the very begging from scratch - then we can try it on our own. But this way really worked so...
+- Maybe we also can get the pp files to follow
+- git code/commands difficult to see/ issue with enterpirce account wanting to fork gebular GitHub account
+- Could we have the presentation before hand? I prefer writing/making noes and adding to it. I haven't resolved the 'conflict' expercise yet.
+
+Do more of this:
+
++ Well explained. Great at answering my questions and showing me what I did wrong
++ R directions were very good (running through the examples helped) - one-on-one is awesome :D
++ Hands on experience workds the best for programming courses
++ live coding. Coding challenges
++ The explanations if we needed help
++ Having R code displayed on the screen; showing multiple ways to accomplish something w/ R
++ The one-on-one!! K- great job at walking me, julie, Simon, and everyone else through this!!
++ I learnt new things. Pretty hands on. Looking forward to working with real data.
++ learning piping %>%
++ I liked learning how to work the basics of git
+
+###Afternoon
+
+Try to improve this:
+
+- long but understandably
+- Some datasets didn't follow example, so mor eexamples would be great (Mosaik vs Mariana files)
+- Maybe a little fast (needed time to look at csv we downloaded)
+- hard to see code you write (even when close) -> use different R studio color scheme?
+- Went thru too fast on the last pieces of Rstudion (workign on metadata)
+- It took me a while to instal the git packages from Git
+
+More of this:
+
++ Help to understand data
++ it helped a lot that you did it with us and explained everything you did and why
++ I had never really made an entire function on my own before so it was wonderful to be abel to create my own
++ worked w/ experience w/ Rmarkdowns. Methods for data/column organization. Sweep button! [I didn't know about this]
++ Follow along coding from screan
+
+##Day 2
+Based on feedback from Day 1 we started the workshop with a review of git and then set the students to work on different data ingestions.
+
+# Wrap-up email
+
+Dear data hackers,
+
+Thank you all for making the CPEAT hackathon such a success! We had over a dozen pull requests submitted to ISCN/SOC-DRaHR and one new utility function submitted to ISCN/soilDataR. 
+
+We hope that you found the hackathon useful in your own studies and research. If you had any feedback on the hackathon that you would like to share (good or bad) you can send it directly to either Julie Loisel or Kathe Todd-Brown. This would help us improve the workshop to bring data hacking to more people in the future!
+
+There are several ways to stay involved with SOC-DRaHR and ISCN in general. You can join the International Soil Carbon Network mailing list by going here http://iscn.fluxdata.org/ and clicking on the 'Join today' button at the bottom of the screen; this will keep you up to date on the events that are going on that are of interest to the soils community. SOC-DRaHR has a very low volumne mailing list that you can sign up for here https://groups.google.com/forum/#!forum/soc-drahr to discuss the direction of the repository and data products. You can also go to the main repository on git hub https://github.com/ISCN/SOC-DRaHR and click on the 'Watch' button in the upper right of the screen and be notified of any pull requests submitted as well as any new issues opened for the repository.
+
+Folks who have added code to the repository and added your name/email address to the contributor document should expect an email from Kathe sometime in the next few months concerning upcoming co-authorships and publication opertunities.
+
+It was a pleasure to meet each and everyone one of you!
+Best,
+-Kathe Todd-Brown
+-Julie Loisel
+
+# Student pre-workshop profile
 
 Question | YES	| NO 
 ---|--|--
