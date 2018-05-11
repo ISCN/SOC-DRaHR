@@ -80,8 +80,9 @@ readInCPEAT2018May <- function(filename, #where is the download
   }
   
   ##Pull the non-isotope data table
+  depthID <- c('depth', data01nonNum)
   sampleData01 <- allData[, data01Col] %>%
-    gather(key='header', value='value', -depth, -one_of(data01nonNum)) %>%
+    gather(key='header', value='value', -one_of(depthID)) %>%
     #gather(key='header', value='value', -depth, -peat_type) %>% #convert to long format exclude columns that are characters not numerics
     filter(!is.na(value) & !grepl('^\\s*$', value)) %>% #remove missing values
     mutate(value=as.numeric(value)) %>% #make sure values are numerics
@@ -109,9 +110,9 @@ readInCPEAT2018May <- function(filename, #where is the download
            sigma=as.numeric(sigma))
   
   ##Construct the layer description to add to wide table
+  layerID <- c('layer_name', 'layer_top', 'layer_bottom', data01nonNum)
   layer_description <- sampleData01 %>% ungroup() %>%
-    select(layer_name, layer_top, layer_bottom,
-           one_of(c('peat_type'))) %>%
+    select(one_of(layerID)) %>%
     full_join(sampleData02 %>% ungroup ()%>%
                 select(layer_name, layer_top, layer_bottom), 
               by=c("layer_name", "layer_top", "layer_bottom")) %>%
@@ -184,15 +185,24 @@ allFiles <- c( "86-Kvartal.csv", "Aero.csv",
   "Utikuma.csv", "V34.csv", "Vasyugan.csv", "VC04-06.csv", #68
   "Zoige.csv")
 
+bad_colWidth <- c('Lebel.csv', 'Plaine.csv')
+
+##TODO
 multiple_cores <- c('Joey.csv', 'Mariana.csv', 'NW-BG.csv', 'Ours.csv')
 two_cores <- c('Nuikluk.csv', "Rogovaya.csv", "Sundance.csv")
 badCasting <- c('Selwyn.csv', 'Upper_Pinto.csv')
-bad_colWidth <- c('Lebel.csv', 'Plaine.csv')
+
 
 ans <- list(long=data.frame(), wide=data.frame())
-for(rootname in setdiff(allFiles, c(multiple_cores, bad_colWidth, two_cores, badCasting))){
+for(rootname in setdiff(allFiles, c(multiple_cores, two_cores, badCasting))){
   #print(rootname)
-  temp <- readInCPEAT2018May(filename=file.path(data.dir, rootname), debug=TRUE)
+  if(rootname %in% bad_colWidth){
+    temp <- readInCPEAT2018May(filename=file.path(data.dir, rootname),
+                               data01Col = 5:13, data01nonNum = c(), 
+                               data02Col = 16:22, debug=TRUE)
+  }else{
+    temp <- readInCPEAT2018May(filename=file.path(data.dir, rootname), debug=TRUE)
+  }
   
   ans$sample <- ans$sample %>%
     bind_rows(temp$sample)
@@ -212,8 +222,11 @@ ans$sample %>% filter(unit == 'non standard') %>% print
 ```{r plotEverything}
 plot.df <- ans$sample %>%
            left_join(ans$layer %>% select(layer_name, site_name), by='layer_name')
+ggplot(plot.df) +
+          geom_histogram(aes(x=value)) +
+          facet_wrap(~header+unit, scales='free') 
 
-for(oneSite in ans$site$site_name[1:9]){
+for(oneSite in ans$site$site_name[1]){
 
   print(ggplot(plot.df %>% filter(site_name==oneSite)) +
           #geom_histogram(data=plot.df %>% sample_n(sum(plot.df$site_name==oneSite)),
