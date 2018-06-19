@@ -29,7 +29,8 @@ library(fiftystater)
 ```
 
 ```{r loadData}
-
+ISCN3 <- processData_ISCN3(dataDir='~/Documents/Datasets/ISCN_3/', verbose=TRUE)
+save(ISCN3, file='~/Documents/Datasets/ISCN_3/ISCN3.RData')
 if(file.exists('../temp/ISCN3.RData')){
   load('../temp/ISCN3.RData')
 }else{
@@ -39,6 +40,21 @@ if(file.exists('../temp/ISCN3.RData')){
 ```
 ```{r cleanUp}
 #load('../temp/ISCN3.RData')
+load('~/Documents/Datasets/ISCN_3/ISCN3.RData')
+
+##Add new indecies for possible duplications
+ISCN3$field <- ISCN3$field %>% 
+  mutate(fieldID_byString = group_indices(., lat, lon, 
+                                        layer_bottom, layer_top, observation_date)) %>%
+  mutate_at(c('layer_bottom', 'layer_top', 'observation_date'),
+            funs(num=round(as.numeric(as.character(.)), 0))) %>%
+  mutate_at(c('lat', 'lon'), funs(num=round(as.numeric(as.character(.)), 1))) %>%
+  mutate(fieldID_byApprox = group_indices(., lat_num, lon_num, 
+                                         layer_bottom_num, layer_top_num,
+                                   observation_date_num)) %>%
+  select(-ends_with('_num'))
+
+
 ##recast the lat-lon as numerics
 ISCN3$field <- ISCN3$field  %>%
   mutate(lat=as.numeric(lat), lon=as.numeric(lon))
@@ -48,6 +64,9 @@ hardUnits.df <- ISCN3$ISCNKey %>% filter(type == 'value', !is.na(hardUnit)) %>% 
 ISCN3$measure <-  ISCN3$measure %>% 
   left_join(select(filter(ISCN3$ISCNKey, type=='value'), var, hardUnit), by='var') %>%
   mutate(unit=if_else(grepl('\\w', unit) , as.character(unit), hardUnit))
+
+##Check country based on lat/lon
+
 ```
 
 
