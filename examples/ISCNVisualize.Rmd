@@ -54,6 +54,30 @@ ISCN3$field <- ISCN3$field %>%
                                    observation_date_num)) %>%
   select(-ends_with('_num'))
 
+##Identify non-located entries
+noLocation <- ISCN3$field %>%
+  filter(is.na(lat), is.na(lon), 
+         is.na(layer_bottom), is.na(layer_top),
+         is.na(observation_date)) %>%
+  select(ends_with('_name'), starts_with('fieldID')) %>%
+  unique()
+
+##Identify conflicting entries
+problematicFieldEntries <- ISCN3$field %>%
+  filter(!is.na(lat), !is.na(lon), !is.na(layer_bottom), !is.na(layer_top),
+         !is.na(observation_date)) %>% #only look at well defined sites
+  select(-lat, -lon, -layer_bottom, -layer_top, -observation_date, 
+         -fieldID, -fieldID_byApprox) %>% #look at non-identifying columns
+  group_by(fieldID_byString) %>% #group by entry matching
+  gather(key='header', value='value', -fieldID_byString, na.rm=TRUE) %>%
+  group_by(fieldID_byString, header) %>%
+  unique() %>%
+  tally()  %>% #count up number of unique values for that header
+  filter(n > 1) #only care about headers with more then one value
+  
+#ISCN3$field$fieldID_byString %>% unique %>% length
+#problematicFieldEntries$fieldID_byString %>% unique %>% length
+#problematicFieldEntries %>% arrange(-n) %>% head
 
 ##recast the lat-lon as numerics
 ISCN3$field <- ISCN3$field  %>%
