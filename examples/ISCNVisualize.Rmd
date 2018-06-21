@@ -75,6 +75,7 @@ problematicFieldEntries <- ISCN3$field %>%
   tally()  %>% #count up number of unique values for that header
   filter(n > 1) #only care about headers with more then one value
   
+#dim(noLocation)
 #ISCN3$field$fieldID_byString %>% unique %>% length
 #problematicFieldEntries$fieldID_byString %>% unique %>% length
 #problematicFieldEntries %>% arrange(-n) %>% head
@@ -90,7 +91,32 @@ ISCN3$measure <-  ISCN3$measure %>%
   mutate(unit=if_else(grepl('\\w', unit) , as.character(unit), hardUnit))
 
 ##Check country based on lat/lon
-
+countryCheck <- ISCN3$field %>%
+  filter(is.finite(lat+lon)) %>%
+  select(lat, lon, country) %>%
+  mutate(country=recode(country, "United States"="USA",
+                        "Federated States of Micronesia" = "Micronesia",
+                        "Korea, Republic of"="South Korea",
+                        "Congo (Democratic Republic of the)" = 
+                          "Democratic Republic of the Congo",
+                        "Unknown"=as.character(NA))) %>%
+  unique() %>%
+  mutate(mapsID=as.factor(maps::map.where(y=lat, x=lon))) %>%
+  mutate(mapsID=recode(mapsID,
+                       'Puerto Rico'='USA:Puerto Rico',
+                       'Virgin Islands, US:Saint Croix'=
+                         'USA:Virgin Islands, US:Saint Croix',
+                       'Virgin Islands, US:Saint John'=
+                         'USA:Virgin Islands, US:Saint John',
+                       'Virgin Islands, US:Saint Thomas'=
+                         'USA:Virgin Islands, US:Saint Thomas',
+                       'Guam'='USA:Guam')) %>%
+  group_by(country, mapsID) %>%
+  mutate(countryMatch = as.logical(grepl(as.character(country[1]), as.character(mapsID))),
+         onlyOne = xor(is.na(country), is.na(mapsID)))
+  
+#countryCheck %>% filter(!countryMatch) %>% summary
+#temp <- countryCheck %>% filter(!countryMatch & !onlyOne)
 ```
 
 
