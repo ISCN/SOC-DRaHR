@@ -1,3 +1,6 @@
+# ignore mac folder file
+.DS_Store
+
 # History files
 .Rhistory
 .Rapp.history
