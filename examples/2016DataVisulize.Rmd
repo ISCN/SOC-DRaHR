@@ -26,8 +26,8 @@ Datasets are:
 2) Alamos soil C stocks (<1MB, XLSX format, download only; ISCNtemplate_Alamos): This site-level dataset comes courtesy of Kris Johnson and collaborators at ITSON (Obregon, MX). It contains 30 profiles sampled by quantitative pit as part of a NASA-supported C monitoring study.
 
 ```{r download}
-dataDir <- tempdir() #if you want to download to a temp directory
-#dataDir <- '~/Documents/Datasets/temp' #rename if you prefer a different local director
+#dataDir <- tempdir() #if you want to download to a temp directory
+dataDir <- '~/Documents/Datasets/ISCN4' #rename if you prefer a different local director
 
 TreatFilename <- file.path(dataDir, 'ISCNtemplate_Treat_peatProps_v2.xlsx')
 if(!file.exists(TreatFilename)){
@@ -67,6 +67,34 @@ readr::write_csv(path=AlamosFilename[4],
 
 ```{r readKey}
 key.df <- read_csv('../dataset_keys/ISCNtemplate_2016Key.csv')
+```
+
+```{r newTREAT}
+dois <- c('10.1594/PANGAEA.863692',
+            '10.1594/PANGAEA.863695', 
+            '10.1594/PANGAEA.863689')
+  
+  TreatS1 <- pangaear::pg_data(doi = '10.1594/PANGAEA.863689')
+  
+  idColumns <- c('Event', 'Site', 'Core', 'Latitude', 'Longitude', 
+                 'Height [m]', "Depth [m]",
+                 'Reference', 'Lab label',
+                 "ID (Reference number)", "ID (Auth-Site-CoreID)")
+  numericColumns <- c( "Age [ka BP]", "Age e [±]", "Age UCL [a AD]",                  
+                       "Age LCL [a AD]", "Age model [ka]", "n [#]")
+  factorColumns <- c("Analysis (Bulk density)", "Analysis (% OM)",
+                     "Analysis (% C)", "Analysis (% N)",
+                     "Analysis (C:N)", "Analysis (Cacc_noQC)",
+                     "Analysis (Caccumulation (1/kya))","Analysis (Peat Type)",
+                     "Analysis (Ecosystem Type)", "Comment")
+  
+  ans_num <- TreatS1[[1]]$data %>%
+    #group_by_at(idColumns) %>%
+    #select(one_of(c(idColumns, numericColumns))) %>%
+    gather(key='ColumnNames', value='value', numericColumns, na.rm = TRUE) %>%
+    mutate_if(is.character, as.factor) %>%
+    group_by_at(idColumns)
+  
 ```
 
 ```{r loadData}
