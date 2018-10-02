@@ -29,18 +29,17 @@ library(fiftystater)
 ```
 
 ```{r loadData}
-ISCN3 <- processData_ISCN3(dataDir='~/Documents/Datasets/ISCN_3/', verbose=TRUE)
-save(ISCN3, file='~/Documents/Datasets/ISCN_3/ISCN3.RData')
-if(file.exists('../temp/ISCN3.RData')){
-  load('../temp/ISCN3.RData')
+dataDir <- '~/Documents/Datasets/ISCN_3/'
+if(file.exists(file.path(dataDir, 'ISCN3.RData'))){
+  load(file.path(dataDir, 'ISCN3.RData'))
 }else{
-  ISCN3 <- processData_ISCN3(verbose=TRUE)
-  save(ISCN3, file='../temp/ISCN3.RData')
+  ISCN3 <- processData_ISCN3(dataDir=dataDir, verbose=TRUE)
+  save(ISCN3, file=file.path(dataDir, 'ISCN3.RData'))
 }
 ```
 ```{r cleanUp}
 #load('../temp/ISCN3.RData')
-load('~/Documents/Datasets/ISCN_3/ISCN3.RData')
+#load('~/Documents/Datasets/ISCN_3/ISCN3.RData')
 
 ##Add new indecies for possible duplications
 ISCN3$field <- ISCN3$field %>% 
